@@ -35,6 +35,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function getNameAttribute(): string
+    {
+        return trim((string) $this->nombre . ' ' . (string) $this->apellidos);
+    }
+
     public function rol()
     {
         return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');

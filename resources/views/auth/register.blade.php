@@ -32,16 +32,16 @@
 
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label class="form-label-custom" for="name">Nombre</label>
+                    <label class="form-label-custom" for="nombre">Nombre</label>
                     <div class="input-icon-wrap">
                         <i class="bi bi-person"></i>
-                        <input type="text" id="name" name="name"
-                               class="form-control-custom {{ $errors->get('name') ? 'is-invalid' : '' }}"
-                               value="{{ old('name') }}"
+                        <input type="text" id="nombre" name="nombre"
+                               class="form-control-custom {{ $errors->get('nombre') ? 'is-invalid' : '' }}"
+                               value="{{ old('nombre') }}"
                                placeholder="Admin"
-                               required autofocus autocomplete="name">
+                               required autofocus autocomplete="given-name">
                     </div>
-                    @foreach($errors->get('name') as $msg)
+                    @foreach($errors->get('nombre') as $msg)
                         <div class="error-msg">{{ $msg }}</div>
                     @endforeach
                 </div>
