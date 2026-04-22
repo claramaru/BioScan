@@ -14,7 +14,7 @@ chmod -R 777 /var/www/html/bootstrap/cache
 php artisan config:cache
 php artisan route:cache
 php artisan migrate --force
-php artisan db:seed --class=DataBaseSeeder --force
+php artisan db:seed --class=DatabaseSeeder --force
 
 
 nginx -g 'daemon off;'
