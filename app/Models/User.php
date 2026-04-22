@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -31,6 +30,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -40,25 +40,21 @@ class User extends Authenticatable
         return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
     }
 
+    public function alimentaciones()
+    {
+        return $this->hasMany(Alimentacion::class, 'id_usuario', 'id_usuario');
+    }
+
+    public function fichasMedicas()
+    {
+        return $this->hasMany(FichaMedica::class, 'id_usuario', 'id_usuario');
+    }
+
     public function tienePrivilegio(string $nombre): bool
     {
         $this->loadMissing('rol.privilegios');
 
-        return $this->rol
+        return $this->rol !== null
             && $this->rol->privilegios->contains('nombre', $nombre);
-    }
-
-    public function esAdministrador(): bool
-    {
-        $this->loadMissing('rol');
-
-        return strtolower((string) optional($this->rol)->nombre) === 'administrador';
-    }
-
-    public function esRol(string $nombre): bool
-    {
-        $this->loadMissing('rol');
-
-        return strtolower((string) optional($this->rol)->nombre) === strtolower($nombre);
     }
 }

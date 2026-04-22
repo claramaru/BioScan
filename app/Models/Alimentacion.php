@@ -2,20 +2,28 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Alimentacion extends Model
 {
+    use HasFactory;
+
     protected $table = 'alimentacion';
     protected $primaryKey = 'id_alimentacion';
     public $timestamps = false;
 
     protected $fillable = [
         'id_animal',
-        'id_pienso',
+        'tipo_pienso',
         'cantidad',
         'fecha',
         'id_usuario',
+    ];
+
+    protected $casts = [
+        'cantidad' => 'decimal:2',
+        'fecha' => 'date',
     ];
 
     public function animal()
@@ -26,10 +34,5 @@ class Alimentacion extends Model
     public function usuario()
     {
         return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
-    }
-
-    public function pienso()
-    {
-        return $this->belongsTo(Pienso::class, 'id_pienso', 'id_pienso');
     }
 }
