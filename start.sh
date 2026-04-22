@@ -1,4 +1,3 @@
-
 #!/bin/sh
 
 php-fpm85 --allow-to-run-as-root -D
