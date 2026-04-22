@@ -133,7 +133,8 @@ class DashboardController extends Controller
     // Mezcla alimentacion y ficha medica para mostrar una actividad reciente unica.
     public function actividadReciente()
     {
-        // Eventos de alimentacion.
+        // Cargamos cada fuente por separado para evitar choques de collation en MySQL
+        // cuando se combinan literales y columnas de tablas distintas mediante UNION.
         $alimentaciones = DB::table('alimentacion')
             ->leftJoin('animal', 'alimentacion.id_animal', '=', 'animal.id_animal')
             ->leftJoin('pienso', 'alimentacion.id_pienso', '=', 'pienso.id_pienso')
@@ -144,7 +145,9 @@ class DashboardController extends Controller
                 DB::raw("COALESCE(animal.especie, 'Sin especie') as especie"),
                 DB::raw("COALESCE(pienso.nombre, 'Sin pienso') as detalle")
             )
-            ->orderByDesc('alimentacion.fecha');
+            ->orderByDesc('alimentacion.fecha')
+            ->limit(5)
+            ->get();
 
         // Eventos medicos. Distinguimos revision y tratamiento para la UI.
         $fichas = DB::table('ficha_medica')
@@ -160,13 +163,19 @@ class DashboardController extends Controller
                 'animal.especie',
                 'ficha_medica.diagnostico as detalle'
             )
-            ->orderByDesc('ficha_medica.fecha');
-
-        // Unimos ambas fuentes para que el frontend reciba una sola lista cronologica.
-        $actividad = $alimentaciones->union($fichas)
-            ->orderByDesc('fecha')
+            ->orderByDesc('ficha_medica.fecha')
             ->limit(5)
             ->get();
+
+        // Unimos ambas fuentes ya en PHP para conservar una sola lista cronologica
+        // sin depender de UNION SQL entre collations heterogeneas.
+        $actividad = $alimentaciones
+            ->concat($fichas)
+            ->sortByDesc(function ($item) {
+                return (string) $item->fecha;
+            })
+            ->take(5)
+            ->values();
 
         return response()->json($actividad);
     }

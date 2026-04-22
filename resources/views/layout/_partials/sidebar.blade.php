@@ -58,7 +58,7 @@
             <div class="sidebar-user-header">
                 <div class="sidebar-user-meta">
                     <div class="sidebar-user-name">{{ auth()->user()->nombre }} {{ auth()->user()->apellidos }}</div>
-                    <div class="sidebar-user-role">{{ auth()->user()->rol->nombre }}</div>
+                    <div class="sidebar-user-role">{{ auth()->user()->rol->nombre ?? 'Sin rol' }}</div>
                 </div>
 
                 <details class="sidebar-user-menu">
