@@ -22,7 +22,3 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
-start.sh
-Dockerfile
-nginx.conf
-/app/Providers/AppServiceProvider.php
