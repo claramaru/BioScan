@@ -318,7 +318,7 @@ class AnimalController extends Controller
                         'id_alimentacion' => $alim->id_alimentacion,
                         'id_animal' => $alim->id_animal,
                         'id_pienso' => $alim->id_pienso,
-                        'tipo_pienso' => $alim->tipo_pienso,
+                        'tipo_pienso' => $alim->pienso_nombre,
                         'cantidad' => (float) $alim->cantidad,
                         'fecha' => $alim->fecha,
                         'id_usuario' => $alim->id_usuario,

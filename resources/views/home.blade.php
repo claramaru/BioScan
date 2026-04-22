@@ -39,7 +39,7 @@
                 <div class="auth-avatar">{{ strtoupper(substr(auth()->user()->nombre, 0, 1)) }}</div>
                 <div>
                     <div class="auth-name">Hola, {{ auth()->user()->nombre }} {{ auth()->user()->apellidos }}</div>
-                    <div class="auth-role">{{ auth()->user()->rol->nombre }}</div>
+                    <div class="auth-role">{{ auth()->user()->rol->nombre ?? 'Sin rol' }}</div>
                 </div>
             </div>
             <div class="hero-cta">

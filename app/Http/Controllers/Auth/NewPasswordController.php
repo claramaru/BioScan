@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
@@ -41,10 +42,15 @@ class NewPasswordController extends Controller
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user) use ($request) {
-                $user->forceFill([
+                $payload = [
                     'password' => Hash::make($request->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+                ];
+
+                if (Schema::hasColumn($user->getTable(), 'remember_token')) {
+                    $payload['remember_token'] = Str::random(60);
+                }
+
+                $user->forceFill($payload)->save();
 
                 event(new PasswordReset($user));
             }
