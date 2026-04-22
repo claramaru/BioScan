@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FichaMedica extends Model
 {
@@ -26,12 +27,12 @@ class FichaMedica extends Model
         'fecha' => 'date',
     ];
 
-    public function animal()
+    public function animal(): BelongsTo
     {
         return $this->belongsTo(Animal::class, 'id_animal', 'id_animal');
     }
 
-    public function usuario()
+    public function usuario(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
     }

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -11,6 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             CebaderoSeeder::class,
+            PiensoSeeder::class,
             RolSeeder::class,
             PrivilegioSeeder::class,
             RolPrivilegioSeeder::class,

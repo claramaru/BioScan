@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Cebadero extends Model
 {
@@ -18,7 +19,7 @@ class Cebadero extends Model
         'ubicacion',
     ];
 
-    public function animales()
+    public function animales(): HasMany
     {
         return $this->hasMany(Animal::class, 'id_cebadero', 'id_cebadero');
     }

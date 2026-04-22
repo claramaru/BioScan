@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -18,8 +20,8 @@ class User extends Authenticatable
         'nombre',
         'apellidos',
         'email',
-        'password',
         'id_rol',
+        'password',
     ];
 
     protected $hidden = [
@@ -35,22 +37,17 @@ class User extends Authenticatable
         ];
     }
 
-    public function getNameAttribute(): string
-    {
-        return trim((string) $this->nombre . ' ' . (string) $this->apellidos);
-    }
-
-    public function rol()
+    public function rol(): BelongsTo
     {
         return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
     }
 
-    public function alimentaciones()
+    public function alimentaciones(): HasMany
     {
         return $this->hasMany(Alimentacion::class, 'id_usuario', 'id_usuario');
     }
 
-    public function fichasMedicas()
+    public function fichasMedicas(): HasMany
     {
         return $this->hasMany(FichaMedica::class, 'id_usuario', 'id_usuario');
     }
@@ -61,19 +58,5 @@ class User extends Authenticatable
 
         return $this->rol !== null
             && $this->rol->privilegios->contains('nombre', $nombre);
-    }
-
-    public function esAdministrador(): bool
-    {
-        $this->loadMissing('rol');
-
-        return strtolower((string) optional($this->rol)->nombre) === 'administrador';
-    }
-
-    public function esRol(string $nombre): bool
-    {
-        $this->loadMissing('rol');
-
-        return strtolower((string) optional($this->rol)->nombre) === strtolower($nombre);
     }
 }

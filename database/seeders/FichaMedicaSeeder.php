@@ -14,7 +14,7 @@ class FichaMedicaSeeder extends Seeder
             ['id_ficha' => 2, 'id_animal' => 2, 'id_usuario' => 2, 'diagnostico' => 'Cojera leve', 'tratamiento' => 'Anti-inflamatorio 3 días', 'observaciones' => 'Revisar suelo del corral', 'fecha' => '2025-02-13'],
             ['id_ficha' => 3, 'id_animal' => 3, 'id_usuario' => 3, 'diagnostico' => 'Deshidratación', 'tratamiento' => 'Suero + control de agua', 'observaciones' => 'Vigilar bebederos', 'fecha' => '2025-02-14'],
             ['id_ficha' => 4, 'id_animal' => 4, 'id_usuario' => 4, 'diagnostico' => '', 'tratamiento' => '', 'observaciones' => '', 'fecha' => '2026-02-25'],
-            ['id_ficha' => 5, 'id_animal' => 19, 'id_usuario' => 4, 'diagnostico' => '', 'tratamiento' => '', 'observaciones' => '', 'fecha' => '2026-04-20'],
+            ['id_ficha' => 7, 'id_animal' => 21, 'id_usuario' => 4, 'diagnostico' => '', 'tratamiento' => '', 'observaciones' => '', 'fecha' => '2026-04-21'],
         ]);
     }
 }

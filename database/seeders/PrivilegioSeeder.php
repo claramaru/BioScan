@@ -24,6 +24,7 @@ class PrivilegioSeeder extends Seeder
             ['id_privilegio' => 12, 'nombre' => 'editar_observaciones_ficha_medica', 'descripcion' => 'Editar solo observaciones'],
             ['id_privilegio' => 13, 'nombre' => 'gestionar_usuario', 'descripcion' => 'Gestionar usuarios'],
             ['id_privilegio' => 14, 'nombre' => 'gestionar_rol', 'descripcion' => 'Gestionar roles y privilegios'],
+            ['id_privilegio' => 15, 'nombre' => 'gestionar_pienso', 'descripcion' => null],
         ]);
     }
 }

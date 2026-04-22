@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Privilegio extends Model
 {
@@ -18,8 +19,15 @@ class Privilegio extends Model
         'descripcion',
     ];
 
-    public function roles()
+    public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Rol::class, 'rol_privilegio', 'id_privilegio', 'id_rol');
+        return $this->belongsToMany(
+            Rol::class,
+            'rol_privilegio',
+            'id_privilegio',
+            'id_rol',
+            'id_privilegio',
+            'id_rol'
+        );
     }
 }
