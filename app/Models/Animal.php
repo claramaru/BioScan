@@ -16,6 +16,8 @@ class Animal extends Model
     protected $fillable = [
         'codigo',
         'especie',
+        'raza',
+        'id_pienso_recomendado',
         'tipo_pienso_recomendado',
         'lote',
         'fecha_alta',
@@ -35,6 +37,11 @@ class Animal extends Model
     public function alimentaciones()
     {
         return $this->hasMany(Alimentacion::class, 'id_animal', 'id_animal');
+    }
+
+    public function piensoRecomendado()
+    {
+        return $this->belongsTo(Pienso::class, 'id_pienso_recomendado', 'id_pienso');
     }
 
     public function fichasMedicas()

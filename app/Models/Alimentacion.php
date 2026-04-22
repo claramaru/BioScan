@@ -15,7 +15,7 @@ class Alimentacion extends Model
 
     protected $fillable = [
         'id_animal',
-        'tipo_pienso',
+        'id_pienso',
         'cantidad',
         'fecha',
         'id_usuario',
@@ -34,5 +34,10 @@ class Alimentacion extends Model
     public function usuario()
     {
         return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
+    }
+
+    public function pienso()
+    {
+        return $this->belongsTo(Pienso::class, 'id_pienso', 'id_pienso');
     }
 }
