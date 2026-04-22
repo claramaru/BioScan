@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\DB;
 
 class AlimentacionController extends Controller
 {
+    private function animalTieneColumna(string $columna): bool
+    {
+        return \Illuminate\Support\Facades\Schema::hasColumn('animal', $columna);
+    }
+
     private function denegado(string $permiso)
     {
         $priv = Privilegio::where('nombre', $permiso)->first();
@@ -64,15 +69,19 @@ class AlimentacionController extends Controller
 
     private function construirResumenAlimentacion(Request $request)
     {
+        $subconsultaAnimales = $this->animalTieneColumna('id_pienso_recomendado')
+            ? '(
+                    SELECT COUNT(*)
+                    FROM animal a2
+                    WHERE a2.id_pienso_recomendado = alimentacion.id_pienso
+                )'
+            : '0';
+
         return $this->construirConsultaAlimentacionBase($request)
             ->select(
                 'alimentacion.id_pienso',
                 'pienso.nombre as tipo_pienso',
-                DB::raw('(
-                    SELECT COUNT(*)
-                    FROM animal a2
-                    WHERE a2.id_pienso_recomendado = alimentacion.id_pienso
-                ) as total_animales'),
+                DB::raw($subconsultaAnimales . ' as total_animales'),
                 DB::raw('SUM(alimentacion.cantidad) as total_kg')
             )
             ->groupBy('alimentacion.id_pienso', 'pienso.nombre')

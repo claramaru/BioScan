@@ -15,6 +15,11 @@ use Illuminate\Validation\Rule;
 
 class AnimalController extends Controller
 {
+    private function animalTieneColumna(string $columna): bool
+    {
+        return Schema::hasColumn('animal', $columna);
+    }
+
     // Respuesta comun para accesos denegados por permisos.
     private function denegado(string $permiso)
     {
@@ -53,20 +58,33 @@ class AnimalController extends Controller
         $cebadero = trim((string) $request->query('cebadero', ''));
 
         $consulta = Animal::with(['cebadero', 'piensoRecomendado']);
+        $tieneRaza = $this->animalTieneColumna('raza');
+        $tienePiensoRecomendado = $this->animalTieneColumna('id_pienso_recomendado');
+        $tieneObservaciones = $this->animalTieneColumna('observaciones');
 
         // Busqueda general sobre los campos principales del modulo.
         if ($q !== '') {
-            $consulta->where(function ($query) use ($q) {
+            $consulta->where(function ($query) use ($q, $tieneRaza, $tienePiensoRecomendado, $tieneObservaciones) {
                     $query->where('codigo', 'like', '%' . $q . '%')
                     ->orWhere('especie', 'like', '%' . $q . '%')
-                    ->orWhere('raza', 'like', '%' . $q . '%')
                     ->orWhere('lote', 'like', '%' . $q . '%')
-                    ->orWhere('fecha_alta', 'like', '%' . $q . '%')
-                    ->orWhereHas('piensoRecomendado', function ($piensoQuery) use ($q) {
-                        $piensoQuery->where('nombre', 'like', '%' . $q . '%');
-                    })
-                    ->orWhere('observaciones', 'like', '%' . $q . '%')
-                    ->orWhereHas('cebadero', function ($cebaderoQuery) use ($q) {
+                    ->orWhere('fecha_alta', 'like', '%' . $q . '%');
+
+                    if ($tieneRaza) {
+                        $query->orWhere('raza', 'like', '%' . $q . '%');
+                    }
+
+                    if ($tienePiensoRecomendado) {
+                        $query->orWhereHas('piensoRecomendado', function ($piensoQuery) use ($q) {
+                            $piensoQuery->where('nombre', 'like', '%' . $q . '%');
+                        });
+                    }
+
+                    if ($tieneObservaciones) {
+                        $query->orWhere('observaciones', 'like', '%' . $q . '%');
+                    }
+
+                    $query->orWhereHas('cebadero', function ($cebaderoQuery) use ($q) {
                         $cebaderoQuery->where('nombre', 'like', '%' . $q . '%');
                     });
             });
@@ -81,7 +99,7 @@ class AnimalController extends Controller
             $consulta->where('especie', $especie);
         }
 
-        if ($raza !== '') {
+        if ($tieneRaza && $raza !== '') {
             $consulta->where('raza', 'like', '%' . $raza . '%');
         }
 
@@ -93,11 +111,11 @@ class AnimalController extends Controller
             $consulta->whereDate('fecha_alta', $fechaAlta);
         }
 
-        if ($idPienso !== '') {
+        if ($tienePiensoRecomendado && $idPienso !== '') {
             $consulta->where('id_pienso_recomendado', $idPienso);
         }
 
-        if ($observaciones !== '') {
+        if ($tieneObservaciones && $observaciones !== '') {
             $consulta->where('observaciones', 'like', '%' . $observaciones . '%');
         }
 
@@ -124,7 +142,9 @@ class AnimalController extends Controller
         return view('animal.index', [
             'animales' => $animales,
             'cebaderos' => Cebadero::orderBy('nombre')->get(['id_cebadero', 'nombre']),
-            'piensos' => Pienso::where('activo', true)->orderBy('nombre')->get(['id_pienso', 'nombre']),
+            'piensos' => $this->animalTieneColumna('id_pienso_recomendado')
+                ? Pienso::where('activo', true)->orderBy('nombre')->get(['id_pienso', 'nombre'])
+                : collect(),
             'filtros' => [
                 'q' => trim((string) $request->query('q', '')),
                 'codigo' => trim((string) $request->query('codigo', '')),
@@ -417,7 +437,9 @@ class AnimalController extends Controller
         }
 
         $cebaderos = Cebadero::orderBy('nombre')->get();
-        $piensos = Pienso::where('activo', true)->orderBy('nombre')->get(['id_pienso', 'nombre']);
+        $piensos = $this->animalTieneColumna('id_pienso_recomendado')
+            ? Pienso::where('activo', true)->orderBy('nombre')->get(['id_pienso', 'nombre'])
+            : collect();
 
         return view('animal.create', compact('cebaderos', 'piensos'));
     }
@@ -429,18 +451,29 @@ class AnimalController extends Controller
             return $this->denegado('crear_animal');
         }
 
-        $request->validate([
+        $rules = [
             'codigo' => ['required', 'max:50', 'unique:animal,codigo'],
             'especie' => 'required|max:50',
-            'raza' => 'nullable|max:120',
-            'id_pienso_recomendado' => 'nullable|integer|exists:pienso,id_pienso',
             'lote' => 'required|max:50',
             'fecha_alta' => 'required|date',
-            'observaciones' => 'nullable|max:1000',
             'id_cebadero' => 'required|integer|exists:cebadero,id_cebadero',
-        ]);
+        ];
 
-        Animal::create($request->only('codigo', 'especie', 'raza', 'id_pienso_recomendado', 'lote', 'fecha_alta', 'observaciones', 'id_cebadero'));
+        if ($this->animalTieneColumna('raza')) {
+            $rules['raza'] = 'nullable|max:120';
+        }
+
+        if ($this->animalTieneColumna('id_pienso_recomendado')) {
+            $rules['id_pienso_recomendado'] = 'nullable|integer|exists:pienso,id_pienso';
+        }
+
+        if ($this->animalTieneColumna('observaciones')) {
+            $rules['observaciones'] = 'nullable|max:1000';
+        }
+
+        $data = $request->validate($rules);
+
+        Animal::create($data);
 
         return redirect()->route('animal.index')->with('ok', 'Animal creado correctamente');
     }
@@ -483,7 +516,9 @@ class AnimalController extends Controller
 
         $cebaderos = Cebadero::orderBy('nombre')->get();
         $animal->loadMissing('piensoRecomendado');
-        $piensos = Pienso::where('activo', true)->orderBy('nombre')->get(['id_pienso', 'nombre']);
+        $piensos = $this->animalTieneColumna('id_pienso_recomendado')
+            ? Pienso::where('activo', true)->orderBy('nombre')->get(['id_pienso', 'nombre'])
+            : collect();
 
         return view('animal.edit', compact('animal', 'cebaderos', 'piensos'));
     }
@@ -495,30 +530,34 @@ class AnimalController extends Controller
             return $this->denegado('editar_animal');
         }
 
-        $request->validate([
+        $rules = [
             'codigo' => ['required', 'max:50', Rule::unique('animal', 'codigo')->ignore($id, 'id_animal')],
             'especie' => 'required|max:50',
-            'raza' => 'nullable|max:120',
-            'id_pienso_recomendado' => 'nullable|integer|exists:pienso,id_pienso',
             'lote' => 'required|max:50',
             'fecha_alta' => 'required|date',
-            'observaciones' => 'nullable|max:1000',
             'id_cebadero' => 'required|integer|exists:cebadero,id_cebadero',
-        ]);
+        ];
+
+        if ($this->animalTieneColumna('raza')) {
+            $rules['raza'] = 'nullable|max:120';
+        }
+
+        if ($this->animalTieneColumna('id_pienso_recomendado')) {
+            $rules['id_pienso_recomendado'] = 'nullable|integer|exists:pienso,id_pienso';
+        }
+
+        if ($this->animalTieneColumna('observaciones')) {
+            $rules['observaciones'] = 'nullable|max:1000';
+        }
+
+        $data = $request->validate($rules);
 
         $animal = Animal::find($id);
         if (!$animal) {
             abort(404);
         }
 
-        $animal->codigo = $request->codigo;
-        $animal->especie = $request->especie;
-        $animal->raza = $request->raza;
-        $animal->id_pienso_recomendado = $request->id_pienso_recomendado;
-        $animal->lote = $request->lote;
-        $animal->fecha_alta = $request->fecha_alta;
-        $animal->observaciones = $request->observaciones;
-        $animal->id_cebadero = $request->id_cebadero;
+        $animal->fill($data);
         $animal->save();
 
         return redirect()->route('animal.index')->with('ok', 'Animal actualizado correctamente');
