@@ -33,13 +33,15 @@ class Alimentacion extends Model
         return $this->belongsTo(Animal::class, 'id_animal', 'id_animal');
     }
 
+    public function usuario(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
+    }
+
     public function pienso(): BelongsTo
     {
         return $this->belongsTo(Pienso::class, 'id_pienso', 'id_pienso');
     }
 
-    public function usuario(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
-    }
+    
 }

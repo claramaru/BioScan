@@ -9,11 +9,11 @@ class PiensoSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('pienso')->insert([
+        DB::table('pienso')->upsert([
             ['id_pienso' => 1, 'nombre' => 'Pienso crecimiento', 'activo' => 1],
             ['id_pienso' => 2, 'nombre' => 'Pienso engorde', 'activo' => 1],
             ['id_pienso' => 3, 'nombre' => 'Pienso mantenimiento', 'activo' => 1],
             ['id_pienso' => 4, 'nombre' => 'adsad', 'activo' => 1],
-        ]);
+        ], ['id_pienso'], ['nombre', 'activo']);
     }
 }
