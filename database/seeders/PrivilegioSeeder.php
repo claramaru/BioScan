@@ -9,7 +9,7 @@ class PrivilegioSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('privilegio')->insert([
+        DB::table('privilegio')->upsert([
             ['id_privilegio' => 1, 'nombre' => 'ver_animal', 'descripcion' => 'Ver animales'],
             ['id_privilegio' => 2, 'nombre' => 'crear_animal', 'descripcion' => 'Crear animales'],
             ['id_privilegio' => 3, 'nombre' => 'editar_animal', 'descripcion' => 'Editar animales'],
@@ -25,6 +25,6 @@ class PrivilegioSeeder extends Seeder
             ['id_privilegio' => 13, 'nombre' => 'gestionar_usuario', 'descripcion' => 'Gestionar usuarios'],
             ['id_privilegio' => 14, 'nombre' => 'gestionar_rol', 'descripcion' => 'Gestionar roles y privilegios'],
             ['id_privilegio' => 15, 'nombre' => 'gestionar_pienso', 'descripcion' => null],
-        ]);
+        ], ['id_privilegio'], ['nombre', 'descripcion']);
     }
 }

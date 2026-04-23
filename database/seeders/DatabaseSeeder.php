@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             UsuarioSeeder::class,
             AnimalSeeder::class,
             AlimentacionSeeder::class,
+            AnimalBreedSeeder::class,
             FichaMedicaSeeder::class,
         ]);
     }

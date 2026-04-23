@@ -9,7 +9,7 @@ class RolPrivilegioSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('rol_privilegio')->insert([
+        DB::table('rol_privilegio')->insertOrIgnore([
             ['id_rol' => 1, 'id_privilegio' => 1], ['id_rol' => 1, 'id_privilegio' => 2],
             ['id_rol' => 1, 'id_privilegio' => 3], ['id_rol' => 1, 'id_privilegio' => 4],
             ['id_rol' => 1, 'id_privilegio' => 5], ['id_rol' => 1, 'id_privilegio' => 6],

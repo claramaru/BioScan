@@ -9,7 +9,7 @@ class UsuarioSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('usuario')->insert([
+        DB::table('usuario')->upsert([
             [
                 'id_usuario' => 1,
                 'nombre' => 'Admin',
@@ -70,6 +70,6 @@ class UsuarioSeeder extends Seeder
                 'remember_token' => null,
                 'email_verified_at' => null,
             ],
-        ]);
+        ], ['id_usuario'], ['nombre', 'apellidos', 'email', 'id_rol', 'password', 'remember_token', 'email_verified_at']);
     }
 }

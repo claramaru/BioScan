@@ -9,7 +9,7 @@ class AnimalSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('animal')->insert([
+        DB::table('animal')->upsert([
             ['id_animal' => 1, 'codigo' => 'ANM-001', 'especie' => 'Porcino', 'raza' => 'Cerdo ibérico de cebo', 'id_pienso_recomendado' => 1, 'tipo_pienso_recomendado' => 'Pienso crecimiento', 'lote' => 'L001', 'fecha_alta' => '2025-02-01', 'observaciones' => 'Ingreso estable. Revision inicial completada.', 'id_cebadero' => 1],
             ['id_animal' => 2, 'codigo' => 'ANM-002', 'especie' => 'Porcino', 'raza' => 'Chato murciano', 'id_pienso_recomendado' => 2, 'tipo_pienso_recomendado' => 'Pienso engorde', 'lote' => 'L001', 'fecha_alta' => '2025-02-03', 'observaciones' => 'Buen consumo de pienso durante la primera semana.', 'id_cebadero' => 1],
             ['id_animal' => 3, 'codigo' => 'ANM-003', 'especie' => 'Porcino', 'raza' => 'Cerdo blanco de engorde', 'id_pienso_recomendado' => 3, 'tipo_pienso_recomendado' => 'Pienso mantenimiento', 'lote' => 'L002', 'fecha_alta' => '2025-02-05', 'observaciones' => 'Se recomienda seguimiento de peso quincenal.', 'id_cebadero' => 2],
@@ -29,6 +29,6 @@ class AnimalSeeder extends Seeder
             ['id_animal' => 17, 'codigo' => 'ANM-017', 'especie' => 'Vacuno', 'raza' => 'Novillo', 'id_pienso_recomendado' => 3, 'tipo_pienso_recomendado' => 'Pienso mantenimiento', 'lote' => 'L001', 'fecha_alta' => '2025-03-04', 'observaciones' => 'Se recomienda control de hidratacion.', 'id_cebadero' => 2],
             ['id_animal' => 18, 'codigo' => 'ANM-018', 'especie' => 'Avicola', 'raza' => 'Pollo campero de engorde', 'id_pienso_recomendado' => 1, 'tipo_pienso_recomendado' => 'Pienso crecimiento', 'lote' => 'L002', 'fecha_alta' => '2025-03-06', 'observaciones' => 'Lote homogeneo y sin bajas registradas.', 'id_cebadero' => 1],
             ['id_animal' => 21, 'codigo' => 'ANM-020', 'especie' => 'Avicola', 'raza' => 'Pollo de engorde (broiler)', 'id_pienso_recomendado' => 2, 'tipo_pienso_recomendado' => 'Pienso engorde', 'lote' => 'L005', 'fecha_alta' => '2026-04-21', 'observaciones' => 'Relleno a tope.', 'id_cebadero' => 1],
-        ]);
+        ], ['id_animal'], ['codigo', 'especie', 'raza', 'id_pienso_recomendado', 'tipo_pienso_recomendado', 'lote', 'fecha_alta', 'observaciones', 'id_cebadero']);
     }
 }
