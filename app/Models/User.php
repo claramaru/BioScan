@@ -59,4 +59,18 @@ class User extends Authenticatable
         return $this->rol !== null
             && $this->rol->privilegios->contains('nombre', $nombre);
     }
+
+    public function esAdministrador(): bool
+    {
+        $this->loadMissing('rol');
+
+        return strtolower((string) optional($this->rol)->nombre) === 'administrador';
+    }
+
+    public function esRol(string $nombre): bool
+    {
+        $this->loadMissing('rol');
+
+        return strtolower((string) optional($this->rol)->nombre) === strtolower($nombre);
+    }
 }
