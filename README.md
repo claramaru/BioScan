@@ -1,53 +1,49 @@
-# BioScan
+# 📁 Documentación del Proyecto
 
-Aplicación web para la gestión de explotaciones ganaderas, animales, alimentación y usuarios.
+Este repositorio centraliza toda la documentación del proyecto. Aquí encontrarás los documentos oficiales, los enlaces a los tests, el acceso al Drive compartido y las imágenes utilizadas en la documentación.
 
-## Objetivo
+---
 
-BioScan permite registrar y consultar información relacionada con:
-- animales,
-- cebaderos,
-- alimentación,
-- pienso,
-- fichas médicas,
-- usuarios y roles.
+## 📄 Documentos
 
-## Stack tecnológico
+En esta carpeta se irán añadiendo todos los documentos relacionados con el proyecto: especificaciones, guías, actas, informes y cualquier otro archivo relevante.
 
-- PHP 8.2
-- Laravel 12
-- Blade
-- JavaScript
-- Vite
-- Bootstrap 5
-- Bootstrap Icons
-- CSS personalizado
-- MySQL / MariaDB
+---
 
-## Estructura del proyecto
+## 🧪 Tests
 
-- `app/` → Lógica principal de la aplicación (modelos, controladores, providers)
-- `resources/views/` → Vistas Blade
-- `resources/js/` → JavaScript fuente
-- `resources/css/` → CSS fuente
-- `public/` → Archivos públicos compilados y recursos estáticos
-- `routes/` → Definición de rutas web y API
-- `database/migrations/` → Migraciones de base de datos
-- `database/seeders/` → Datos de ejemplo o iniciales
-- `tests/` → Tests automáticos
+Enlaces a los tests del proyecto:
 
-## Módulos principales
+| Nombre | Enlace |
+|--------|--------|
+| Test 1 | [Añadir enlace]() |
+| Test 2 | [Añadir enlace]() |
 
-- `Animales` → Alta, edición, consulta e historial de animales
-- `Cebaderos` → Gestión de cebaderos
-- `Alimentación` → Registro y consulta de alimentación
-- `Piensos` → Gestión de tipos de pienso
-- `Usuarios y roles` → Control de acceso y permisos
-- `Ficha médica` → Información sanitaria asociada a animales
+> Actualiza esta tabla con los enlaces reales a medida que se vayan añadiendo los tests.
 
-## Requisitos
+---
 
-- PHP 8.2 o superior
-- Composer
-- Node.js y npm
-- MySQL o MariaDB
+## ☁️ Google Drive
+
+Acceso a la carpeta compartida del proyecto en Drive:
+
+🔗 [Carpeta Drive del proyecto](https://drive.google.com) ← *Reemplaza con el enlace real*
+
+---
+
+## 🖼️ Imágenes
+
+La carpeta `/imagenes` contiene todas las imágenes utilizadas en la documentación del proyecto (capturas de pantalla, diagramas, mockups, etc.).
+
+```
+/imagenes
+  ├── captura-01.png
+  ├── diagrama-flujo.png
+  └── ...
+```
+
+---
+
+## 🤝 Contribución
+
+Si añades nuevos documentos, tests o imágenes, actualiza este README para que el equipo siempre tenga una referencia clara de qué hay disponible.
