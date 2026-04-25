@@ -1,11 +1,11 @@
-##Documentación del Proyecto
+# 📁 Documentación del Proyecto
 
 Esta rama centraliza toda la documentación del proyecto. Aquí se encontrarán los documentos oficiales, los enlaces a los tests, el acceso al Drive compartido y las imágenes utilizadas en la documentación.
 ---
-#Documentos
+## 📄 Documentos
 En esta carpeta se irán añadiendo todos los documentos relacionados con el proyecto: especificaciones, guías, actas, informes y cualquier otro archivo relevante.
 ---
-#Tests
+## 🧪 Tests
 
 Enlaces a los tests del proyecto:
 
@@ -13,7 +13,7 @@ Enlaces a los tests del proyecto:
 |--------|--------|
 | Test 1 | [Añadir enlace]() |
 ---
-##Google Drive
+## ☁️ Google Drive
 
 Acceso a la carpeta compartida del proyecto en Drive:
 
