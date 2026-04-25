@@ -1,4 +1,4 @@
-#Documentación del Proyecto
+##Documentación del Proyecto
 
 Esta rama centraliza toda la documentación del proyecto. Aquí se encontrarán los documentos oficiales, los enlaces a los tests, el acceso al Drive compartido y las imágenes utilizadas en la documentación.
 ---
