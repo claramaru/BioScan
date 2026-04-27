@@ -100,15 +100,19 @@ class DashboardController extends Controller
     // Devuelve los ultimos animales incorporados para la tabla lateral del dashboard.
     public function animalesRecientes()
     {
+        $ultimaFichaPorAnimal = DB::table('ficha_medica')
+            ->select('id_animal', DB::raw('MAX(fecha) as fecha'))
+            ->groupBy('id_animal');
+
         $animales = DB::table('animal')
             ->join('cebadero', 'animal.id_cebadero', '=', 'cebadero.id_cebadero')
+            ->leftJoinSub($ultimaFichaPorAnimal, 'ultima_ficha', function ($join) {
+                $join->on('ultima_ficha.id_animal', '=', 'animal.id_animal');
+            })
             ->leftJoin('ficha_medica', function ($join) {
                 // Solo nos interesa la ultima ficha medica de cada animal para resumir su estado.
                 $join->on('ficha_medica.id_animal', '=', 'animal.id_animal')
-                    ->whereRaw('ficha_medica.fecha = (
-                        SELECT MAX(f2.fecha) FROM ficha_medica f2
-                        WHERE f2.id_animal = animal.id_animal
-                    )');
+                    ->on('ficha_medica.fecha', '=', 'ultima_ficha.fecha');
             })
             ->select(
                 'animal.id_animal',
