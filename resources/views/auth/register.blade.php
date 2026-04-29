@@ -34,7 +34,7 @@
                 <div class="col-md-6">
                     <label class="form-label-custom" for="nombre">Nombre</label>
                     <div class="input-icon-wrap">
-                        <i class="bi bi-person"></i>
+                        <i class="bi bi-person bi-icon"></i>
                         <input type="text" id="nombre" name="nombre"
                                class="form-control-custom {{ $errors->get('nombre') ? 'is-invalid' : '' }}"
                                value="{{ old('nombre') }}"
@@ -49,7 +49,7 @@
                 <div class="col-md-6">
                     <label class="form-label-custom" for="apellidos">Apellidos</label>
                     <div class="input-icon-wrap">
-                        <i class="bi bi-person"></i>
+                        <i class="bi bi-person bi-icon"></i>
                         <input type="text" id="apellidos" name="apellidos"
                                class="form-control-custom {{ $errors->get('apellidos') ? 'is-invalid' : '' }}"
                                value="{{ old('apellidos') }}"
@@ -64,7 +64,7 @@
                 <div class="col-12">
                     <label class="form-label-custom" for="email">Correo electronico</label>
                     <div class="input-icon-wrap">
-                        <i class="bi bi-envelope"></i>
+                        <i class="bi bi-envelope bi-icon"></i>
                         <input type="email" id="email" name="email"
                                class="form-control-custom {{ $errors->get('email') ? 'is-invalid' : '' }}"
                                value="{{ old('email') }}"
@@ -81,12 +81,12 @@
                 <div class="col-12">
                     <label class="form-label-custom" for="password">Contrasena</label>
                     <div class="input-icon-wrap">
-                        <i class="bi bi-lock"></i>
+                        <i class="bi bi-lock bi-icon"></i>
                         <input type="password" id="password" name="password"
                                class="form-control-custom {{ $errors->get('password') ? 'is-invalid' : '' }}"
                                placeholder="Minimo 8 caracteres"
                                required autocomplete="new-password">
-                        <button type="button" class="toggle-pass" onclick="togglePass('password', this)">
+                        <button type="button" class="toggle-pass" onclick="togglePass('password', this)" aria-label="Mostrar contrasena">
                             <i class="bi bi-eye"></i>
                         </button>
                     </div>
@@ -98,12 +98,12 @@
                 <div class="col-12">
                     <label class="form-label-custom" for="password_confirmation">Confirmar contrasena</label>
                     <div class="input-icon-wrap">
-                        <i class="bi bi-lock-fill"></i>
+                        <i class="bi bi-lock-fill bi-icon"></i>
                         <input type="password" id="password_confirmation" name="password_confirmation"
                                class="form-control-custom {{ $errors->get('password_confirmation') ? 'is-invalid' : '' }}"
                                placeholder="Repite la contrasena"
                                required autocomplete="new-password">
-                        <button type="button" class="toggle-pass" onclick="togglePass('password_confirmation', this)">
+                        <button type="button" class="toggle-pass" onclick="togglePass('password_confirmation', this)" aria-label="Mostrar contrasena">
                             <i class="bi bi-eye"></i>
                         </button>
                     </div>
@@ -137,9 +137,11 @@ function togglePass(id, btn) {
     if (input.type === 'password') {
         input.type = 'text';
         icon.className = 'bi bi-eye-slash';
+        btn.setAttribute('aria-label', 'Ocultar contrasena');
     } else {
         input.type = 'password';
         icon.className = 'bi bi-eye';
+        btn.setAttribute('aria-label', 'Mostrar contrasena');
     }
 }
 </script>
