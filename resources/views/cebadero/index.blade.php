@@ -7,6 +7,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('css/animal/index.css') }}">
 <link rel="stylesheet" href="{{ asset('css/cebadero/index.css') }}">
 @endpush
 
@@ -60,11 +61,11 @@
     <div class="top-bar">
         <div class="page-title">Cebaderos</div>
         <div class="d-flex gap-2 align-items-center flex-wrap">
-            <a href="{{ route('dashboard') }}" class="cebaderos-top-btn cebaderos-top-btn-secondary">
+            <a href="{{ route('dashboard') }}" class="animals-top-btn animals-top-btn-secondary">
                 <i class="bi bi-grid-1x2-fill me-1"></i>Dashboard
             </a>
             @if(!empty($puedeCrearCebadero) && $puedeCrearCebadero)
-                <a href="{{ route('cebadero.create') }}" class="cebaderos-top-btn cebaderos-top-btn-primary">
+                <a href="{{ route('cebadero.create') }}" class="animals-top-btn animals-top-btn-primary">
                     <i class="bi bi-plus-lg me-1"></i>Nuevo cebadero
                 </a>
             @endif
@@ -110,49 +111,25 @@
             <div id="estado-filtros" class="text-muted estado-filtros"></div>
         </div>
 
-        <form id="filtros-cebaderos" method="GET" action="{{ route('cebadero.index') }}" class="cebaderos-filters">
-            <div class="cebaderos-filters-header">
-                <div class="cebaderos-filters-title">Busqueda de cebaderos</div>
-                <p class="cebaderos-filters-copy">Refina el listado por nombre, ubicacion, estado o especie para encontrar antes el cebadero que necesitas sin perder la vista general del modulo.</p>
+        <form id="filtros-cebaderos" method="GET" action="{{ route('cebadero.index') }}" class="animals-filters">
+            <div class="animals-filters-header">
+                <div class="animals-filters-title">Busqueda de cebaderos</div>
             </div>
 
-            <div class="cebaderos-filters-grid">
-                <div class="cebadero-filter-field cebadero-filter-field-wide">
-                    <label for="filtro-q" class="cebadero-filter-label">Busqueda general</label>
-                    <input type="text" id="filtro-q" name="q" class="cebadero-filter-control" placeholder="Ej: cebadero, ubicacion o especie..." value="{{ $filtros['q'] ?? '' }}">
-                </div>
-
-                <div class="cebadero-filter-field">
-                    <label for="filtro-estado" class="cebadero-filter-label">Estado</label>
-                    <select id="filtro-estado" name="estado" class="cebadero-filter-control">
-                        <option value="">Todos</option>
-                        <option value="Con animales" {{ ($filtros['estado'] ?? '') === 'Con animales' ? 'selected' : '' }}>Con animales</option>
-                        <option value="Sin animales" {{ ($filtros['estado'] ?? '') === 'Sin animales' ? 'selected' : '' }}>Sin animales</option>
-                    </select>
-                </div>
-
-                <div class="cebadero-filter-field">
-                    <label for="filtro-especie" class="cebadero-filter-label">Especie</label>
-                    <select id="filtro-especie" name="especie" class="cebadero-filter-control">
-                        <option value="">Todas</option>
-                        @foreach($especiesResumen as $especie)
-                            <option value="{{ $especie }}" {{ ($filtros['especie'] ?? '') === $especie ? 'selected' : '' }}>{{ $especie }}</option>
-                        @endforeach
-                    </select>
+            <div class="animals-filters-grid">
+                <div class="animal-filter-field animal-filter-field-wide">
+                    <label for="filtro-q" class="animal-filter-label">Busqueda general</label>
+                    <input type="text" id="filtro-q" name="q" class="animal-filter-control" placeholder="Ej: cebadero, ubicacion o especie..." value="{{ $filtros['q'] ?? '' }}">
                 </div>
             </div>
 
-            <div class="cebaderos-filters-actions">
-                <button type="submit" class="cebaderos-btn-submit">
-                    <i class="bi bi-search"></i> Aplicar filtros
-                </button>
-                <button type="reset" id="limpiar-filtros" class="cebaderos-btn-reset">
+            <div class="animals-filters-actions">
+                <button type="reset" id="limpiar-filtros" class="animals-btn-reset">
                     Limpiar
                 </button>
             </div>
-        </form>
 
-        <table class="table mb-0 cebaderos-table">
+        <table class="table mb-0">
             <thead>
                 <tr>
                     <th>Cebadero</th>
@@ -162,6 +139,29 @@
                     <th>Estado</th>
                     @if($mostrarAcciones)
                         <th class="th-acciones">Acciones</th>
+                    @endif
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th>
+                        <select id="filtro-especie" name="especie" class="form-select form-select-sm">
+                            <option value="">Todas</option>
+                            @foreach($especiesResumen as $especie)
+                                <option value="{{ $especie }}" {{ ($filtros['especie'] ?? '') === $especie ? 'selected' : '' }}>{{ $especie }}</option>
+                            @endforeach
+                        </select>
+                    </th>
+                    <th>
+                        <select id="filtro-estado" name="estado" class="form-select form-select-sm">
+                            <option value="">Todos</option>
+                            <option value="Con animales" {{ ($filtros['estado'] ?? '') === 'Con animales' ? 'selected' : '' }}>Con animales</option>
+                            <option value="Sin animales" {{ ($filtros['estado'] ?? '') === 'Sin animales' ? 'selected' : '' }}>Sin animales</option>
+                        </select>
+                    </th>
+                    @if($mostrarAcciones)
+                        <th></th>
                     @endif
                 </tr>
             </thead>
@@ -218,6 +218,7 @@
                 @endforelse
             </tbody>
         </table>
+        </form>
     </div>
 </main>
 @endsection

@@ -1,7 +1,6 @@
 <section>
     <header>
-        <h2 class="profile-card-title">Información personal</h2>
-        <p class="profile-card-text">Actualiza tu nombre, apellidos y dirección de correo electrónico.</p>
+        <h2 class="profile-card-title">Informacion personal</h2>
     </header>
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
@@ -27,20 +26,20 @@
         </div>
 
         <div class="profile-field">
-            <label class="profile-label" for="email">Correo electrónico</label>
+            <label class="profile-label" for="email">Correo electronico</label>
             <input id="email" name="email" type="email" class="profile-input" value="{{ old('email', $user->email) }}" required autocomplete="username">
             @error('email')<div class="profile-error">{{ $message }}</div>@enderror
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div class="profile-inline-note">
-                    Tu correo electrónico todavía no está verificado.
+                    Tu correo electronico todavia no esta verificado.
                     <button form="send-verification" class="profile-btn profile-btn-secondary" style="padding:.5rem .8rem;margin-top:.6rem;">
-                        Reenviar correo de verificación
+                        Reenviar correo de verificacion
                     </button>
                 </div>
 
                 @if (session('status') === 'verification-link-sent')
-                    <div class="profile-status">Hemos enviado un nuevo enlace de verificación a tu correo.</div>
+                    <div class="profile-status">Hemos enviado un nuevo enlace de verificacion a tu correo.</div>
                 @endif
             @endif
         </div>

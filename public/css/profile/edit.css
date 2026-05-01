@@ -1,14 +1,17 @@
 .profile-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 24px;
     align-items: start;
+    justify-items: center;
 }
 
 .profile-stack {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    max-width: 980px;
+    width: 100%;
 }
 
 .profile-card {
@@ -236,4 +239,54 @@
     .profile-card {
         padding: 17.6px;
     }
+}
+
+.profile-card {
+    border-radius: 22px;
+    padding: 28px;
+}
+
+.profile-card-title {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.profile-card-text {
+    font-size: 17px;
+}
+
+.profile-form {
+    gap: 18px;
+}
+
+.profile-form-grid {
+    gap: 18px;
+}
+
+.profile-label {
+    font-size: 14px;
+}
+
+.profile-input {
+    border-radius: 14px;
+    font-size: 17px;
+    min-height: 54px;
+    padding: 12px 16px;
+}
+
+.profile-error,
+.profile-status,
+.profile-inline-note {
+    font-size: 15px;
+}
+
+.profile-btn {
+    border-radius: 14px;
+    font-size: 17px;
+    min-height: 54px;
+    padding: 12px 24px;
+}
+
+.profile-danger-modal-copy {
+    font-size: 16px;
 }

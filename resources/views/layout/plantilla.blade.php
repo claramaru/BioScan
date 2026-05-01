@@ -13,6 +13,7 @@
             'cebaderos' => ['label' => 'CE', 'bg' => '#475569'],
             'alimentacion' => ['label' => 'AL', 'bg' => '#15803d'],
             'piensos' => ['label' => 'PI', 'bg' => '#0f766e'],
+            'salud' => ['label' => 'SA', 'bg' => '#15803d'],
             'tratamientos' => ['label' => 'TR', 'bg' => '#b91c1c'],
             'revisiones' => ['label' => 'RV', 'bg' => '#7c3aed'],
             'usuarios' => ['label' => 'US', 'bg' => '#1d4ed8'],

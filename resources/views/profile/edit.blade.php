@@ -13,8 +13,7 @@
 <main class="main-wrap">
     <div class="top-bar">
         <div>
-            <div class="profile-title">Perfil</div>
-            <div class="profile-subtitle">Gestiona tu información personal, correo electrónico, contraseña y opciones de seguridad desde un solo lugar.</div>
+            <div class="page-title">Perfil</div>
         </div>
     </div>
 
@@ -32,34 +31,6 @@
                 @include('profile.partials.delete-user-form')
             </div>
         </div>
-
-        <aside class="profile-help-box">
-            <div class="profile-card-title">Tu cuenta</div>
-
-            <ul class="profile-help-list">
-                <li class="profile-help-item">
-                    <div class="profile-help-icon"><i class="bi bi-envelope"></i></div>
-                    <div class="profile-help-copy">
-                        <strong>Correo</strong>
-                        <span>Actualiza tu email y mantén el acceso de la cuenta al día.</span>
-                    </div>
-                </li>
-                <li class="profile-help-item">
-                    <div class="profile-help-icon"><i class="bi bi-shield-lock"></i></div>
-                    <div class="profile-help-copy">
-                        <strong>Seguridad</strong>
-                        <span>Cambia la contraseña cuando lo necesites para reforzar la seguridad.</span>
-                    </div>
-                </li>
-                <li class="profile-help-item">
-                    <div class="profile-help-icon"><i class="bi bi-person-x"></i></div>
-                    <div class="profile-help-copy">
-                        <strong>Eliminar cuenta</strong>
-                        <span>Esta acción es permanente y borrará el acceso del usuario.</span>
-                    </div>
-                </li>
-            </ul>
-        </aside>
     </div>
 </main>
 @endsection

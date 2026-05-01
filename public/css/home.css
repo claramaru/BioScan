@@ -22,7 +22,7 @@ body {
 
 .top-nav {
     background: var(--dark);
-    padding: 14.4px 32px;
+    padding: 20px 42px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -31,12 +31,12 @@ body {
 .nav-logo {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: 20.8px;
+    font-size: 28px;
     color: #fff;
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 6.4px;
+    gap: 10px;
 }
 
 .nav-logo em {
@@ -54,9 +54,9 @@ body {
     background: transparent;
     border: 1px solid #374151;
     color: #9ca3af;
-    border-radius: 8px;
-    padding: 6.4px 16px;
-    font-size: 13.6px;
+    border-radius: 12px;
+    padding: 10px 22px;
+    font-size: 17px;
     text-decoration: none;
     transition: all .2s;
     font-family: 'DM Sans', sans-serif;
@@ -71,9 +71,9 @@ body {
     background: var(--green);
     border: none;
     color: #fff;
-    border-radius: 8px;
-    padding: 6.4px 16px;
-    font-size: 13.6px;
+    border-radius: 12px;
+    padding: 10px 22px;
+    font-size: 17px;
     text-decoration: none;
     font-weight: 600;
     transition: opacity .2s;
@@ -90,34 +90,52 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 64px 24px;
+    padding: 86px 28px 70px;
 }
 
 .hero-inner {
-    max-width: 520px;
+    max-width: 760px;
     text-align: center;
+}
+
+.hero-brand {
+    align-items: center;
+    color: var(--dark);
+    display: inline-flex;
+    font-family: 'Syne', sans-serif;
+    font-size: 34px;
+    font-weight: 800;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.hero-brand i,
+.hero-brand em {
+    color: var(--green);
+    font-style: normal;
 }
 
 .hero-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6.4px;
+    gap: 9px;
     background: #d1fae5;
     color: #065f46;
     border-radius: 20px;
-    padding: 4.8px 14.4px;
-    font-size: 12.48px;
+    padding: 8px 18px;
+    font-size: 16px;
     font-weight: 600;
-    margin-bottom: 24px;
+    margin-bottom: 30px;
 }
 
 .hero-title {
     font-family: 'Syne', sans-serif;
-    font-size: 48px;
+    font-size: 70px;
     font-weight: 800;
     line-height: 1.1;
-    letter-spacing: -1px;
-    margin-bottom: 16px;
+    letter-spacing: 0;
+    margin-bottom: 22px;
 }
 
 .hero-title em {
@@ -127,14 +145,14 @@ body {
 
 .hero-sub {
     color: var(--muted);
-    font-size: 16px;
+    font-size: 21px;
     line-height: 1.6;
-    margin-bottom: 40px;
+    margin-bottom: 46px;
 }
 
 .hero-cta {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     justify-content: center;
     flex-wrap: wrap;
 }
@@ -143,9 +161,10 @@ body {
     background: var(--green);
     color: #fff;
     border: none;
-    border-radius: 10px;
-    padding: 12px 32px;
-    font-size: 15.2px;
+    border-radius: 14px;
+    min-height: 56px;
+    padding: 14px 34px;
+    font-size: 18px;
     font-weight: 600;
     text-decoration: none;
     transition: opacity .2s;
@@ -161,9 +180,10 @@ body {
     background: #fff;
     color: var(--dark);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 32px;
-    font-size: 15.2px;
+    border-radius: 14px;
+    min-height: 56px;
+    padding: 14px 34px;
+    font-size: 18px;
     font-weight: 500;
     text-decoration: none;
     transition: all .2s;
@@ -176,8 +196,8 @@ body {
 }
 
 .features {
-    padding: 0 24px 64px;
-    max-width: 900px;
+    padding: 0 28px 82px;
+    max-width: 1160px;
     margin: 0 auto;
     width: 100%;
 }
@@ -185,37 +205,37 @@ body {
 .feat-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 22px;
 }
 
 .feat-card {
     background: #fff;
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
+    border-radius: 22px;
+    padding: 28px 24px;
     text-align: center;
 }
 
 .feat-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 12px;
-    font-size: 19.2px;
+    margin: 0 auto 16px;
+    font-size: 26px;
 }
 
 .feat-title {
     font-family: 'Syne', sans-serif;
     font-weight: 700;
-    font-size: 14.4px;
-    margin-bottom: 5.6px;
+    font-size: 20px;
+    margin-bottom: 8px;
 }
 
 .feat-desc {
-    font-size: 12.8px;
+    font-size: 16px;
     color: var(--muted);
     line-height: 1.5;
 }
@@ -223,18 +243,18 @@ body {
 .auth-banner {
     background: #fff;
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px 32px;
-    max-width: 520px;
-    margin: 0 auto 32px;
+    border-radius: 22px;
+    padding: 30px 36px;
+    max-width: 680px;
+    margin: 0 auto 36px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 20px;
 }
 
 .auth-avatar {
-    width: 48px;
-    height: 48px;
+    width: 62px;
+    height: 62px;
     border-radius: 50%;
     background: var(--green);
     display: flex;
@@ -242,24 +262,64 @@ body {
     justify-content: center;
     font-weight: 700;
     color: #fff;
-    font-size: 17.6px;
+    font-size: 22px;
     flex-shrink: 0;
 }
 
 .auth-name {
     font-family: 'Syne', sans-serif;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 22px;
 }
 
 .auth-role {
-    font-size: 12.48px;
+    font-size: 16px;
     color: var(--muted);
 }
 
 @media(max-width:640px) {
+    .top-nav {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+        padding: 18px 22px;
+    }
+
+    .nav-logo {
+        font-size: 24px;
+    }
+
+    .nav-links,
+    .btn-login,
+    .btn-register {
+        width: 100%;
+    }
+
+    .btn-login,
+    .btn-register {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .hero {
+        padding: 58px 22px 46px;
+    }
+
     .hero-title {
-        font-size: 32px;
+        font-size: 42px;
+    }
+
+    .hero-brand {
+        font-size: 30px;
+    }
+
+    .hero-sub {
+        font-size: 18px;
+    }
+
+    .cta-primary,
+    .cta-secondary {
+        width: 100%;
     }
 
     .feat-grid {

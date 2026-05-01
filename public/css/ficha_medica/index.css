@@ -1,0 +1,46 @@
+.medical-pill {
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 6px 12px;
+    white-space: nowrap;
+}
+
+.medical-pill-success {
+    background: #eefbf4;
+    color: #177245;
+}
+
+.medical-pill-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.medical-pill-muted {
+    background: #eef2f7;
+    color: #475569;
+}
+
+.medical-pagination {
+    padding: 18px 24px;
+}
+
+.table-card table thead tr:nth-child(2) th {
+    background: #fafafa;
+    padding-bottom: 14px;
+    padding-top: 10px;
+}
+
+.table-card table td:nth-child(4),
+.table-card table td:nth-child(5),
+.table-card table td:nth-child(6) {
+    max-width: 260px;
+}
+
+@media (max-width: 991.98px) {
+    .medical-pill {
+        font-size: 15px;
+        padding: 7px 12px;
+    }
+}

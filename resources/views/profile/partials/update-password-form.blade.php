@@ -1,7 +1,6 @@
 <section>
     <header>
         <h2 class="profile-card-title">Contraseña</h2>
-        <p class="profile-card-text">Usa una contraseña larga y segura para proteger mejor tu cuenta.</p>
     </header>
 
     <form method="post" action="{{ route('password.update') }}" class="profile-form">
@@ -36,7 +35,7 @@
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
                     class="profile-status"
-                >Contraseña actualizada.</p>
+                >Contrasena actualizada.</p>
             @endif
         </div>
     </form>

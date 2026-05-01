@@ -35,13 +35,9 @@
             <span>Piensos</span>
         </a>
     @endif
-    <a href="{{ route('tratamiento.index') }}" class="nav-link {{ $activeNav === 'tratamientos' ? 'active' : '' }}">
-        <i class="bi bi-shield-plus"></i>
-        <span>Tratamientos</span>
-    </a>
-    <a href="{{ route('revision.index') }}" class="nav-link {{ $activeNav === 'revisiones' ? 'active' : '' }}">
+    <a href="{{ route('salud.index') }}" class="nav-link {{ $activeNav === 'salud' ? 'active' : '' }}">
         <i class="bi bi-heart-pulse-fill"></i>
-        <span>Revisiones</span>
+        <span>Salud</span>
     </a>
 
     @if(auth()->user()->esAdministrador())
