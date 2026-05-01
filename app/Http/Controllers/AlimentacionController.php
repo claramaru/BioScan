@@ -6,6 +6,7 @@ use App\Models\Alimentacion;
 use App\Models\Animal;
 use App\Models\Pienso;
 use App\Models\Privilegio;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -35,6 +36,7 @@ class AlimentacionController extends Controller
         $tipoPienso = trim((string) $request->query('tipo_pienso', ''));
         $fecha = trim((string) $request->query('fecha', ''));
         $animal = trim((string) $request->query('id_animal', ''));
+        $responsable = trim((string) $request->query('id_usuario', ''));
 
         $consulta = DB::table('alimentacion')
             ->leftJoin('animal', 'alimentacion.id_animal', '=', 'animal.id_animal')
@@ -64,6 +66,10 @@ class AlimentacionController extends Controller
             $consulta->where('alimentacion.id_animal', $animal);
         }
 
+        if ($responsable !== '') {
+            $consulta->where('alimentacion.id_usuario', $responsable);
+        }
+
         return $consulta;
     }
 
@@ -80,17 +86,26 @@ class AlimentacionController extends Controller
         return $this->construirConsultaAlimentacionBase($request)
             ->select(
                 'alimentacion.id_pienso',
-                'pienso.nombre as tipo_pienso',
+                'alimentacion.id_usuario',
+                // Algunos registros antiguos conservan el nombre en alimentacion.tipo_pienso.
+                DB::raw("COALESCE(NULLIF(pienso.nombre, ''), NULLIF(alimentacion.tipo_pienso, ''), 'Sin pienso') as tipo_pienso"),
+                'usuario.nombre as responsable_nombre',
+                'usuario.apellidos as responsable_apellidos',
                 DB::raw($subconsultaAnimales . ' as total_animales'),
                 DB::raw('SUM(alimentacion.cantidad) as total_kg')
             )
-            ->groupBy('alimentacion.id_pienso', 'pienso.nombre')
-            ->orderBy('pienso.nombre')
+            ->groupBy('alimentacion.id_pienso', 'alimentacion.id_usuario', 'pienso.nombre', 'alimentacion.tipo_pienso', 'usuario.nombre', 'usuario.apellidos')
+            ->orderBy('tipo_pienso')
+            ->orderBy('usuario.nombre')
             ->get()
             ->map(function ($registro) {
+                $responsable = trim((string) $registro->responsable_nombre . ' ' . (string) $registro->responsable_apellidos);
+
                 return [
                     'id_pienso' => $registro->id_pienso,
+                    'id_usuario' => $registro->id_usuario,
                     'tipo_pienso' => $registro->tipo_pienso,
+                    'responsable' => $responsable !== '' ? $responsable : 'Sin responsable',
                     'total_animales' => (int) ($registro->total_animales ?? 0),
                     'total_kg' => (float) ($registro->total_kg ?? 0),
                 ];
@@ -246,6 +261,7 @@ class AlimentacionController extends Controller
             'registros' => $registros,
             'tiposPienso' => Pienso::where('activo', true)->orderBy('nombre')->get(['id_pienso', 'nombre']),
             'animalesFiltro' => Animal::orderBy('codigo')->get(['id_animal', 'codigo', 'especie']),
+            'usuariosFiltro' => User::orderBy('nombre')->orderBy('apellidos')->get(['id_usuario', 'nombre', 'apellidos']),
             'resumen' => [
                 'total' => (int) $resumenBase->count(),
                 'cantidad_total' => (float) DB::table('alimentacion')->sum('cantidad'),
@@ -258,6 +274,7 @@ class AlimentacionController extends Controller
                 'tipo_pienso' => trim((string) $request->query('tipo_pienso', '')),
                 'fecha' => trim((string) $request->query('fecha', '')),
                 'id_animal' => trim((string) $request->query('id_animal', '')),
+                'id_usuario' => trim((string) $request->query('id_usuario', '')),
             ],
             'puedeCrear' => auth()->user()->tienePrivilegio('crear_alimentacion'),
             'puedeCrearCabecera' => $puedeCrearCabecera,

@@ -25,7 +25,7 @@ class RolPrivilegioSeeder extends Seeder
             ['id_rol' => 2, 'id_privilegio' => 10], ['id_rol' => 2, 'id_privilegio' => 15],
             ['id_rol' => 3, 'id_privilegio' => 1], ['id_rol' => 3, 'id_privilegio' => 5],
             ['id_rol' => 3, 'id_privilegio' => 6], ['id_rol' => 3, 'id_privilegio' => 9],
-            ['id_rol' => 3, 'id_privilegio' => 12],
+            ['id_rol' => 3, 'id_privilegio' => 10], ['id_rol' => 3, 'id_privilegio' => 12],
             ['id_rol' => 4, 'id_privilegio' => 1], ['id_rol' => 4, 'id_privilegio' => 3],
             ['id_rol' => 4, 'id_privilegio' => 5], ['id_rol' => 4, 'id_privilegio' => 6],
             ['id_rol' => 4, 'id_privilegio' => 7], ['id_rol' => 4, 'id_privilegio' => 8],

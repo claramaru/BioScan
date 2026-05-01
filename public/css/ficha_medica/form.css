@@ -1,0 +1,224 @@
+.page-subtitle-medical {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.animals-top-btn {
+    align-items: center;
+    border-radius: 10px;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 44px;
+    padding: 10px 20px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.animals-top-btn-secondary {
+    background: #fff;
+    border: 1px solid var(--border);
+    color: var(--muted);
+}
+
+.animals-top-btn-secondary:hover,
+.animals-top-btn-secondary:focus {
+    background: #f8fafc;
+    border-color: #9ca3af;
+    color: var(--dark);
+}
+
+.form-grid {
+    align-items: start;
+    display: grid;
+    gap: 24px;
+    grid-template-columns: 1fr 280px;
+}
+
+.form-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    padding: 24px;
+}
+
+.form-section-title {
+    align-items: center;
+    color: var(--dark);
+    display: flex;
+    font-family: 'Syne', sans-serif;
+    font-size: 14.4px;
+    font-weight: 700;
+    gap: 8px;
+    margin-bottom: 17.6px;
+}
+
+.form-section-title i,
+.preview-title i {
+    color: var(--muted);
+}
+
+.form-label-custom {
+    color: var(--muted);
+    display: block;
+    font-size: 11.52px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin-bottom: 4.8px;
+    text-transform: uppercase;
+}
+
+.required-dot {
+    color: #e74c3c;
+    margin-left: 2px;
+}
+
+.label-optional {
+    color: #9ca3af;
+    font-weight: 500;
+    text-transform: none;
+}
+
+.form-control-custom {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--dark);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    padding: 8.8px 13.6px;
+    transition: border 0.2s, box-shadow 0.2s;
+    width: 100%;
+}
+
+.form-control-custom:disabled {
+    background: #f8fafc;
+    color: #64748b;
+}
+
+.form-control-custom:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px #2ecc7120;
+}
+
+.form-control-custom.is-invalid {
+    border-color: #e74c3c;
+}
+
+.error-msg {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 3.2px;
+}
+
+.alert-errors {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    color: #991b1b;
+    font-size: 13.6px;
+    margin-bottom: 24px;
+    padding: 12px 20px;
+}
+
+.preview-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    position: sticky;
+    top: 32px;
+}
+
+.preview-title {
+    align-items: center;
+    display: flex;
+    font-family: 'Syne', sans-serif;
+    font-size: 14.4px;
+    font-weight: 700;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.preview-copy {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.preview-row {
+    align-items: center;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    font-size: 13.12px;
+    justify-content: space-between;
+    padding: 5.6px 0;
+}
+
+.preview-row:last-child {
+    border-bottom: none;
+}
+
+.preview-row .pk {
+    color: var(--muted);
+    font-size: 11.52px;
+}
+
+.preview-row .pv {
+    font-weight: 500;
+    max-width: 55%;
+    text-align: right;
+}
+
+.form-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-guardar {
+    align-items: center;
+    background: var(--green);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    font-size: 14px;
+    font-weight: 600;
+    gap: 6.4px;
+    padding: 9.6px 22.4px;
+    transition: opacity 0.2s;
+}
+
+.btn-guardar:hover {
+    opacity: 0.85;
+}
+
+.btn-cancelar {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 9.6px 17.6px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-cancelar:hover {
+    border-color: #9ca3af;
+    color: var(--dark);
+}
+
+@media (max-width: 991px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}

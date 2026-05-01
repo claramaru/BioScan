@@ -4,6 +4,7 @@ use App\Http\Controllers\AnimalController;
 use App\Http\Controllers\AlimentacionController;
 use App\Http\Controllers\CebaderoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FichaMedicaController;
 use App\Http\Controllers\PiensoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UsuarioController;
@@ -120,6 +121,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Datos de alimentacion para el filtrado asincrono.
     Route::get('/api/alimentacion', [AlimentacionController::class, 'apiListado'])->name('api.alimentacion.index');
+    Route::get('/api/piensos', [PiensoController::class, 'apiListado'])->name('api.pienso.index');
 
     // Endpoints JSON internos del modulo de animales.
     Route::get('/api/animales', [AnimalController::class, 'apiListado'])->name('api.animales.index');
@@ -128,29 +130,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Endpoint JSON interno del modulo de cebaderos.
     Route::get('/api/cebaderos', [CebaderoController::class, 'apiListado'])->name('api.cebaderos.index');
 
-    // Seccion en preparacion: tratamientos.
-    Route::get('/tratamientos', function () {
-        return view('seccion', [
-            'titulo' => 'Tratamientos',
-            'activeNav' => 'tratamientos',
-            'icono' => 'bi-shield-plus',
-            'estado' => 'Seccion preparada',
-            'descripcion' => 'EN PROCESO.',
-            'siguientePaso' => 'Conectar ficha_medica o un modulo propio',
-        ]);
-    })->name('tratamiento.index');
-
-    // Seccion en preparacion: revisiones.
-    Route::get('/revisiones', function () {
-        return view('seccion', [
-            'titulo' => 'Revisiones',
-            'activeNav' => 'revisiones',
-            'icono' => 'bi-heart-pulse-fill',
-            'estado' => 'Seccion preparada',
-            'descripcion' => 'EN PROCESO.',
-            'siguientePaso' => 'Crear filtros y listado de revisiones',
-        ]);
-    })->name('revision.index');
+    // Modulo de salud basado en ficha_medica.
+    Route::get('/salud', [FichaMedicaController::class, 'index'])->name('salud.index');
+    Route::get('/salud/create', [FichaMedicaController::class, 'create'])->name('salud.create');
+    Route::post('/salud', [FichaMedicaController::class, 'store'])->name('salud.store');
+    Route::get('/salud/{id}/edit', [FichaMedicaController::class, 'edit'])->name('salud.edit');
+    Route::put('/salud/{id}', [FichaMedicaController::class, 'update'])->name('salud.update');
+    Route::delete('/salud/{id}', [FichaMedicaController::class, 'destroy'])->name('salud.destroy');
+    Route::get('/api/salud', [FichaMedicaController::class, 'apiListado'])->name('api.salud.index');
 
     // Gestion de usuarios.
     Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuario.index');

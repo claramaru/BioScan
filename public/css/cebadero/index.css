@@ -71,7 +71,13 @@
     background: var(--card-bg);
     border-radius: 16px;
     border: 1px solid var(--border);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-card table {
+    min-width: 980px;
 }
 
 .table-card .tc-header {

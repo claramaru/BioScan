@@ -15,7 +15,6 @@
     <div class="top-bar">
         <div>
             <div class="page-title">Nuevo pienso</div>
-            <div class="page-subtitle-feed">Anade un tipo de pienso al catalogo general.</div>
         </div>
         <a href="{{ route('pienso.index') }}" class="animals-top-btn animals-top-btn-secondary">
             <i class="bi bi-arrow-left me-1"></i>Volver al catalogo

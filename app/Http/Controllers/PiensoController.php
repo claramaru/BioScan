@@ -26,14 +26,40 @@ class PiensoController extends Controller
         return auth()->check() && auth()->user()->tienePrivilegio('gestionar_pienso');
     }
 
-    public function index()
+    private function construirConsulta(Request $request)
+    {
+        $q = trim((string) $request->query('q', ''));
+        $estado = trim((string) $request->query('estado', ''));
+
+        $consulta = Pienso::query();
+
+        if ($q !== '') {
+            $consulta->where('nombre', 'like', '%' . $q . '%');
+        }
+
+        if ($estado === 'activo') {
+            $consulta->where('activo', true);
+        }
+
+        if ($estado === 'inactivo') {
+            $consulta->where('activo', false);
+        }
+
+        return $consulta->orderBy('nombre');
+    }
+
+    public function index(Request $request)
     {
         if (!$this->puedeGestionar()) {
             return $this->denegado('gestionar_pienso');
         }
 
         return view('pienso.index', [
-            'piensos' => Pienso::orderBy('nombre')->get(),
+            'piensos' => $this->construirConsulta($request)->get(),
+            'filtros' => [
+                'q' => trim((string) $request->query('q', '')),
+                'estado' => trim((string) $request->query('estado', '')),
+            ],
         ]);
     }
 
@@ -100,5 +126,28 @@ class PiensoController extends Controller
         $pienso->save();
 
         return redirect()->route('pienso.index')->with('ok', 'Pienso actualizado correctamente');
+    }
+
+    public function apiListado(Request $request)
+    {
+        if (!$this->puedeGestionar()) {
+            return response()->json([
+                'ok' => false,
+                'mensaje' => 'Acceso denegado',
+            ], 403);
+        }
+
+        return response()->json([
+            'ok' => true,
+            'data' => $this->construirConsulta($request)
+                ->get()
+                ->map(fn ($pienso) => [
+                    'id_pienso' => $pienso->id_pienso,
+                    'nombre' => $pienso->nombre,
+                    'activo' => (bool) $pienso->activo,
+                    'edit_url' => route('pienso.edit', $pienso->id_pienso),
+                ])
+                ->values(),
+        ]);
     }
 }

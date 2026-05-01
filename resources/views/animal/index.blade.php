@@ -155,9 +155,6 @@
             </div>
 
             <div class="animals-filters-actions">
-                <button type="submit" class="animals-btn-submit">
-                    <i class="bi bi-search"></i> Aplicar filtros
-                </button>
                 <button type="reset" id="limpiar-filtros" class="animals-btn-reset">
                     Limpiar
                 </button>

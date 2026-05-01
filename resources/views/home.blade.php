@@ -52,6 +52,10 @@
             </div>
         @else
             <!-- No logueado -->
+            <div class="hero-brand">
+                <i class="bi bi-activity"></i>
+                Bio<em>Scan</em>
+            </div>
             <div class="hero-badge"><i class="bi bi-shield-check"></i> Sistema de gestión ganadera</div>
             <h1 class="hero-title">Control total de tu <em>ganadería</em></h1>
             <p class="hero-sub">BioScan centraliza el seguimiento de animales, alimentación, tratamientos y revisiones médicas en un solo lugar.</p>

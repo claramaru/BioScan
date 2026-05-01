@@ -15,7 +15,6 @@
     <div class="top-bar">
         <div>
             <div class="page-title">Usuarios</div>
-            <div class="page-subtitle">Administracion de cuentas, roles y credenciales para perfiles administradores.</div>
         </div>
     </div>
 
@@ -105,12 +104,12 @@
                             </div>
 
                             <div class="user-field">
-                                <label class="form-label-custom" for="create-password">Contrasena</label>
+                                <label class="form-label-custom" for="create-password">Contraseña</label>
                                 <input type="password" id="create-password" name="password" class="form-control-custom">
                             </div>
 
                             <div class="user-field">
-                                <label class="form-label-custom" for="create-password-confirmation">Confirmar contrasena</label>
+                                <label class="form-label-custom" for="create-password-confirmation">Confirmar contraseña</label>
                                 <input type="password" id="create-password-confirmation" name="password_confirmation" class="form-control-custom">
                             </div>
                         </div>
@@ -124,10 +123,6 @@
                 </form>
             </div>
         </details>
-
-        <div class="users-card-copy-block">
-            <p class="users-card-copy">Cada usuario aparece resumido en una fila para que la administracion sea mas ligera y ordenada. Despliega solo la cuenta que quieras revisar o editar, modifica sus datos principales, cambia el rol si hace falta y gestiona la contrasena sin salir de esta misma pantalla.</p>
-        </div>
 
         <form method="GET" action="{{ route('usuario.index') }}" class="users-filters" id="usuarios-filtros">
             <div class="users-filters-grid">
@@ -250,7 +245,7 @@
                                     </div>
 
                                     <div class="user-field">
-                                        <label class="form-label-custom" for="password-{{ $usuario->id_usuario }}">Nueva contrasena</label>
+                                        <label class="form-label-custom" for="password-{{ $usuario->id_usuario }}">Nueva contraseña</label>
                                         <input
                                             type="password"
                                             id="password-{{ $usuario->id_usuario }}"
@@ -261,13 +256,13 @@
                                     </div>
 
                                     <div class="user-field">
-                                        <label class="form-label-custom" for="password_confirmation-{{ $usuario->id_usuario }}">Confirmar contrasena</label>
+                                        <label class="form-label-custom" for="password_confirmation-{{ $usuario->id_usuario }}">Confirmar contraseña</label>
                                         <input
                                             type="password"
                                             id="password_confirmation-{{ $usuario->id_usuario }}"
                                             name="password_confirmation"
                                             class="form-control-custom"
-                                            placeholder="Repite la nueva contrasena"
+                                            placeholder="Repite la nueva contraseña"
                                         >
                                     </div>
                                 </div>
@@ -460,13 +455,13 @@
                                 </div>
 
                                 <div class="user-field">
-                                    <label class="form-label-custom" for="password-${user.id_usuario}">Nueva contrasena</label>
+                                    <label class="form-label-custom" for="password-${user.id_usuario}">Nueva contraseña</label>
                                     <input type="password" id="password-${user.id_usuario}" name="password" class="form-control-custom" placeholder="Solo si quieres cambiarla">
                                 </div>
 
                                 <div class="user-field">
-                                    <label class="form-label-custom" for="password_confirmation-${user.id_usuario}">Confirmar contrasena</label>
-                                    <input type="password" id="password_confirmation-${user.id_usuario}" name="password_confirmation" class="form-control-custom" placeholder="Repite la nueva contrasena">
+                                    <label class="form-label-custom" for="password_confirmation-${user.id_usuario}">Confirmar contraseña</label>
+                                    <input type="password" id="password_confirmation-${user.id_usuario}" name="password_confirmation" class="form-control-custom" placeholder="Repite la nueva contraseña">
                                 </div>
                             </div>
                         </div>

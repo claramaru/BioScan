@@ -15,7 +15,6 @@
     <div class="top-bar">
         <div>
             <div class="page-title">Nuevo registro de alimentacion</div>
-            <div class="page-subtitle-feed">Registra una nueva alimentacion, con o sin asociarla a un animal concreto.</div>
         </div>
         <a href="{{ $volverUrl ?? route('alimentacion.index') }}" class="animals-top-btn animals-top-btn-secondary">
             <i class="bi bi-arrow-left me-1"></i>Volver al listado

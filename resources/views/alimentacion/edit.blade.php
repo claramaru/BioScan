@@ -15,7 +15,6 @@
     <div class="top-bar">
         <div>
             <div class="page-title">Editar registro de alimentacion</div>
-            <div class="page-subtitle-feed">Actualiza un registro ya guardado de pienso.</div>
         </div>
         <a href="{{ route('alimentacion.index') }}" class="animals-top-btn animals-top-btn-secondary">
             <i class="bi bi-arrow-left me-1"></i>Volver al listado
