@@ -12,11 +12,13 @@ use Illuminate\Support\Facades\DB;
 
 class AlimentacionController extends Controller
 {
+    // Comprueba columnas opcionales de animal para mantener compatibilidad con migraciones anteriores.
     private function animalTieneColumna(string $columna): bool
     {
         return \Illuminate\Support\Facades\Schema::hasColumn('animal', $columna);
     }
 
+    // Respuesta comun para accesos denegados por permisos.
     private function denegado(string $permiso)
     {
         $priv = Privilegio::where('nombre', $permiso)->first();
@@ -30,6 +32,7 @@ class AlimentacionController extends Controller
         ], 403);
     }
 
+    // Consulta base reutilizable para el listado HTML y para la API asincrona.
     private function construirConsultaAlimentacionBase(Request $request)
     {
         $q = trim((string) $request->query('q', ''));
@@ -43,6 +46,7 @@ class AlimentacionController extends Controller
             ->leftJoin('pienso', 'alimentacion.id_pienso', '=', 'pienso.id_pienso')
             ->leftJoin('usuario', 'alimentacion.id_usuario', '=', 'usuario.id_usuario');
 
+        // Busqueda general sobre animal, pienso y responsable.
         if ($q !== '') {
             $consulta->where(function ($query) use ($q) {
                 $query->where('animal.codigo', 'like', '%' . $q . '%')
@@ -54,6 +58,7 @@ class AlimentacionController extends Controller
             });
         }
 
+        // Filtros especificos por pienso, fecha, animal y responsable.
         if ($tipoPienso !== '') {
             $consulta->where('alimentacion.id_pienso', $tipoPienso);
         }
@@ -73,6 +78,7 @@ class AlimentacionController extends Controller
         return $consulta;
     }
 
+    // Agrupa los registros por pienso y responsable para mostrar el resumen de alimentacion.
     private function construirResumenAlimentacion(Request $request)
     {
         $subconsultaAnimales = $this->animalTieneColumna('id_pienso_recomendado')
@@ -113,11 +119,13 @@ class AlimentacionController extends Controller
             ->values();
     }
 
+    // Normaliza el nombre de especie para usarlo como clave en las recomendaciones.
     private function claveEspecie(?string $especie): string
     {
         return mb_strtolower(trim((string) $especie));
     }
 
+    // Calcula cantidades medias por animal, por especie y por tipo de pienso para sugerencias del formulario.
     private function construirRecomendacionesCantidad(): array
     {
         $porAnimal = [];
@@ -180,6 +188,7 @@ class AlimentacionController extends Controller
         ];
     }
 
+    // Valida los datos de un registro individual de alimentacion.
     private function validarRegistro(Request $request): array
     {
         return $request->validate([
@@ -190,6 +199,7 @@ class AlimentacionController extends Controller
         ]);
     }
 
+    // Valida la alimentacion masiva aplicada a varios animales seleccionados.
     private function validarRegistroMasivo(Request $request): array
     {
         return $request->validate([
@@ -201,6 +211,7 @@ class AlimentacionController extends Controller
         ]);
     }
 
+    // Decide a que pantalla volver despues de crear un registro.
     private function resolverRetorno(Request $request): array
     {
         $destino = trim((string) $request->input('return_to', $request->query('return_to', '')));
@@ -229,6 +240,7 @@ class AlimentacionController extends Controller
         ];
     }
 
+    // Listado principal de alimentacion con permisos, filtros, resumenes y datos auxiliares.
     public function index(Request $request)
     {
         if (!auth()->user()->tienePrivilegio('ver_alimentacion')) {
@@ -283,6 +295,7 @@ class AlimentacionController extends Controller
         ]);
     }
 
+    // Muestra el formulario para registrar una alimentacion individual.
     public function create(Request $request)
     {
         if (!auth()->user()->tienePrivilegio('crear_alimentacion')) {
@@ -304,6 +317,7 @@ class AlimentacionController extends Controller
         ]);
     }
 
+    // Guarda un nuevo registro de alimentacion y vuelve al origen adecuado.
     public function store(Request $request)
     {
         if (!auth()->user()->tienePrivilegio('crear_alimentacion')) {
@@ -332,6 +346,7 @@ class AlimentacionController extends Controller
         return redirect()->route('alimentacion.index')->with('ok', 'Registro de alimentacion creado correctamente');
     }
 
+    // Crea el mismo registro de alimentacion para todos los animales seleccionados.
     public function storeMasivo(Request $request)
     {
         if (!auth()->user()->tienePrivilegio('crear_alimentacion')) {
@@ -356,6 +371,7 @@ class AlimentacionController extends Controller
         return redirect()->route('animal.index')->with('ok', 'Alimentacion registrada para ' . count($data['animales']) . ' animales.');
     }
 
+    // Muestra el formulario de edicion de un registro existente.
     public function edit($id)
     {
         if (!auth()->user()->tienePrivilegio('editar_alimentacion')) {
@@ -374,6 +390,7 @@ class AlimentacionController extends Controller
         ]);
     }
 
+    // Actualiza un registro existente y asigna como responsable al usuario que edita.
     public function update(Request $request, $id)
     {
         if (!auth()->user()->tienePrivilegio('editar_alimentacion')) {
@@ -394,6 +411,7 @@ class AlimentacionController extends Controller
         return redirect()->route('alimentacion.index')->with('ok', 'Registro de alimentacion actualizado correctamente');
     }
 
+    // Elimina un registro de alimentacion.
     public function destroy($id)
     {
         if (!auth()->user()->tienePrivilegio('borrar_alimentacion')) {
@@ -410,6 +428,7 @@ class AlimentacionController extends Controller
         return redirect()->route('alimentacion.index')->with('ok', 'Registro de alimentacion eliminado correctamente');
     }
 
+    // Devuelve el listado filtrado en JSON para actualizar la tabla sin recargar la pagina.
     public function apiListado(Request $request)
     {
         if (!auth()->user()->tienePrivilegio('ver_alimentacion')) {

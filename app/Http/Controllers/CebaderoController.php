@@ -3,40 +3,39 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cebadero;
+use App\Models\Privilegio;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class CebaderoController extends Controller
 {
-    // El modulo de cebaderos no tiene privilegio fino definido en este proyecto.
-    // Dejamos la regla de acceso centralizada para que vista y API no diverjan.
-    private function puedeVerCebaderos(): bool
+    // Comprueba un privilegio concreto del modulo de cebaderos.
+    private function puede(string $permiso): bool
     {
-        return auth()->check();
+        return auth()->check() && auth()->user()->tienePrivilegio($permiso);
     }
 
-    private function denegado()
+    // Respuesta comun para accesos denegados por permisos.
+    private function denegado(string $permiso)
     {
-        abort(403);
+        $priv = Privilegio::where('nombre', $permiso)->first();
+        $rolesPermitidos = $priv ? $priv->roles()->pluck('nombre')->toArray() : [];
+
+        return response()->view('acceso_denegado', [
+            'permitido' => false,
+            'permiso' => $permiso,
+            'rolesPermitidos' => $rolesPermitidos,
+            'mensaje' => null,
+        ], 403);
     }
 
+    // Version JSON del acceso denegado para los endpoints asincronos.
     private function denegadoJson()
     {
         return response()->json([
             'ok' => false,
             'mensaje' => 'Acceso denegado',
         ], 403);
-    }
-
-    private function esAdministrador(): bool
-    {
-        return auth()->check() && auth()->user()->esAdministrador();
-    }
-
-    // Reutilizamos una comprobacion sencilla por rol para mantener la misma logica del listado.
-    private function puedeEditarCebadero(): bool
-    {
-        return in_array(strtolower((string) optional(auth()->user()->rol)->nombre), ['administrador', 'supervisor'], true);
     }
 
     // Consulta base del modulo de cebaderos reutilizada por la vista y la API.
@@ -71,6 +70,7 @@ class CebaderoController extends Controller
             }
         }
 
+        // Filtro por especie presente en los animales asociados al cebadero.
         if ($especie !== '') {
             $consulta->whereHas('animales', function ($query) use ($especie) {
                 $query->where('especie', $especie);
@@ -80,11 +80,11 @@ class CebaderoController extends Controller
         return $consulta;
     }
 
-    // Listado principal de cebaderos.
+    // Listado principal de cebaderos con filtros, resumenes y permisos para acciones.
     public function index(Request $request)
     {
-        if (!$this->puedeVerCebaderos()) {
-            return $this->denegado();
+        if (!$this->puede('ver_cebadero')) {
+            return $this->denegado('ver_cebadero');
         }
 
         $cebaderos = $this->construirConsultaCebaderos($request)
@@ -115,27 +115,27 @@ class CebaderoController extends Controller
                 'estado' => trim((string) $request->query('estado', '')),
                 'especie' => trim((string) $request->query('especie', '')),
             ],
-            'puedeCrearCebadero' => $this->esAdministrador(),
-            'puedeEditarCebadero' => $this->puedeEditarCebadero(),
-            'puedeBorrar' => auth()->user()->esAdministrador(),
+            'puedeCrearCebadero' => $this->puede('crear_cebadero'),
+            'puedeEditarCebadero' => $this->puede('editar_cebadero'),
+            'puedeBorrar' => $this->puede('borrar_cebadero'),
         ]);
     }
 
-    // Formulario de alta del cebadero, reservado a administradores.
+    // Formulario de alta del cebadero.
     public function create()
     {
-        if (!$this->esAdministrador()) {
-            abort(403);
+        if (!$this->puede('crear_cebadero')) {
+            return $this->denegado('crear_cebadero');
         }
 
         return view('cebadero.create');
     }
 
-    // Guarda un nuevo cebadero.
+    // Valida y guarda un nuevo cebadero.
     public function store(Request $request)
     {
-        if (!$this->esAdministrador()) {
-            abort(403);
+        if (!$this->puede('crear_cebadero')) {
+            return $this->denegado('crear_cebadero');
         }
 
         $data = $request->validate([
@@ -151,8 +151,8 @@ class CebaderoController extends Controller
     // Formulario de edicion del cebadero.
     public function edit($id)
     {
-        if (!$this->puedeEditarCebadero()) {
-            abort(403);
+        if (!$this->puede('editar_cebadero')) {
+            return $this->denegado('editar_cebadero');
         }
 
         $cebadero = Cebadero::withCount('animales')->find($id);
@@ -163,11 +163,11 @@ class CebaderoController extends Controller
         return view('cebadero.edit', compact('cebadero'));
     }
 
-    // Guarda los cambios del cebadero.
+    // Valida y guarda los cambios de un cebadero existente.
     public function update(Request $request, $id)
     {
-        if (!$this->puedeEditarCebadero()) {
-            abort(403);
+        if (!$this->puede('editar_cebadero')) {
+            return $this->denegado('editar_cebadero');
         }
 
         $request->validate([
@@ -187,10 +187,33 @@ class CebaderoController extends Controller
         return redirect()->route('cebadero.index')->with('ok', 'Cebadero actualizado correctamente');
     }
 
-    // API del listado para el filtrado asincrono.
+    // Elimina un cebadero si no tiene animales asociados.
+    public function destroy($id)
+    {
+        if (!$this->puede('borrar_cebadero')) {
+            return $this->denegado('borrar_cebadero');
+        }
+
+        $cebadero = Cebadero::withCount('animales')->find($id);
+        if (!$cebadero) {
+            abort(404);
+        }
+
+        if ($cebadero->animales_count > 0) {
+            return redirect()
+                ->route('cebadero.index')
+                ->withErrors(['cebadero' => 'No se puede eliminar un cebadero con animales asociados.']);
+        }
+
+        $cebadero->delete();
+
+        return redirect()->route('cebadero.index')->with('ok', 'Cebadero eliminado correctamente');
+    }
+
+    // Devuelve el listado filtrado en JSON para actualizar la tabla sin recargar la pagina.
     public function apiListado(Request $request)
     {
-        if (!$this->puedeVerCebaderos()) {
+        if (!$this->puede('ver_cebadero')) {
             return $this->denegadoJson();
         }
 
@@ -213,6 +236,7 @@ class CebaderoController extends Controller
                     'estado' => $cebadero->animales_count > 0 ? 'Con animales' : 'Sin animales',
                     'estado_clase' => $cebadero->animales_count > 0 ? 'estado-operativo' : 'estado-vacio',
                     'especies' => $especies,
+                    'delete_url' => route('cebadero.destroy', $cebadero->id_cebadero),
                 ];
             })
             ->values();

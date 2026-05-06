@@ -31,7 +31,9 @@
         return ['src' => asset('images/vaca.png'), 'clase' => 'esp-otro', 'alt' => 'Otro'];
     };
 
-    $mostrarAcciones = $puedeGestionarTodo || $puedeEditarObservaciones;
+    $puedeBorrarFicha = !empty($puedeBorrarFicha) && $puedeBorrarFicha;
+    $puedeEditarFicha = $puedeGestionarTodo || $puedeEditarObservaciones;
+    $mostrarAcciones = $puedeEditarFicha || $puedeBorrarFicha;
 @endphp
 
 <main class="main-wrap">
@@ -200,17 +202,21 @@
                                         <a href="{{ route('animal.historial', data_get($ficha, 'id_animal')) }}" class="btn-accion btn-historial" title="Historial">
                                             <i class="bi bi-clock-history"></i>
                                         </a>
-                                        <a href="{{ route('salud.edit', data_get($ficha, 'id_ficha')) }}" class="btn-accion btn-editar" title="Editar">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        @if($puedeGestionarTodo)
-                                            <form method="POST" action="{{ route('salud.destroy', data_get($ficha, 'id_ficha')) }}" class="inline-form" onsubmit="return confirm('Seguro que quieres eliminar este registro de salud?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn-accion btn-borrar" title="Borrar">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
+                                        @if($puedeEditarFicha)
+                                            <a href="{{ route('salud.edit', data_get($ficha, 'id_ficha')) }}" class="btn-accion btn-editar" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        @endif
+                                        @if($puedeBorrarFicha)
+                                            <button
+                                                type="button"
+                                                class="btn-accion btn-borrar salud-delete-trigger"
+                                                title="Borrar"
+                                                data-action="{{ route('salud.destroy', data_get($ficha, 'id_ficha')) }}"
+                                                data-codigo="{{ data_get($ficha, 'animal.codigo', 'Ficha #' . data_get($ficha, 'id_ficha')) }}"
+                                            >
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         @endif
                                     </div>
                                 </td>
@@ -229,6 +235,35 @@
             </div>
         </form>
     </div>
+
+    @if($puedeBorrarFicha)
+        <div class="modal fade" id="modalEliminarSalud" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <form method="POST" id="delete-salud-modal-form">
+                    @csrf
+                    @method('DELETE')
+                    <div class="modal-content animal-delete-modal">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirmar eliminacion</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="animal-delete-word">ELIMINAR</div>
+                            <p class="animal-delete-copy mb-2">Vas a borrar el registro de salud de <strong id="delete-salud-code">-</strong>.</p>
+                            <p class="animal-delete-copy mb-3">Escribe <strong>ELIMINAR</strong> para confirmar.</p>
+                            <input type="text" id="delete-salud-confirm-input" class="form-control animal-delete-input" autocomplete="off" placeholder="Escribe ELIMINAR">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="animals-top-btn animals-top-btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" id="confirm-delete-salud-btn" class="animals-top-btn animals-top-btn-primary" disabled>
+                                <i class="bi bi-trash me-1"></i>Eliminar registro
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
 </main>
 @endsection
 
@@ -243,10 +278,16 @@
     const limpiar = document.getElementById('limpiar-filtros');
     const pagination = document.getElementById('salud-pagination');
     const baseUrl = @json(route('api.salud.index'));
-    const csrf = @json(csrf_token());
     const mostrarAcciones = @json($mostrarAcciones);
-    const puedeGestionarTodo = @json($puedeGestionarTodo);
+    const puedeEditarFicha = @json($puedeEditarFicha);
+    const puedeBorrarFicha = @json($puedeBorrarFicha);
     const colspan = mostrarAcciones ? 9 : 8;
+    const deleteModalElement = document.getElementById('modalEliminarSalud');
+    const deleteModal = deleteModalElement ? new bootstrap.Modal(deleteModalElement) : null;
+    const deleteModalForm = document.getElementById('delete-salud-modal-form');
+    const deleteCode = document.getElementById('delete-salud-code');
+    const deleteInput = document.getElementById('delete-salud-confirm-input');
+    const deleteConfirmBtn = document.getElementById('confirm-delete-salud-btn');
     const iconos = {
         porcino: @json(asset('images/cerdo.png')),
         vacuno: @json(asset('images/vaca.png')),
@@ -293,6 +334,38 @@
         window.history.replaceState({}, '', next);
     }
 
+    function syncDeleteConfirmState() {
+        if (!deleteConfirmBtn || !deleteInput) return;
+        deleteConfirmBtn.disabled = deleteInput.value.trim().toUpperCase() !== 'ELIMINAR';
+    }
+
+    function abrirModalEliminar(triggerElement) {
+        if (!deleteModal || !deleteModalForm) return;
+
+        if (deleteCode) {
+            deleteCode.textContent = triggerElement.dataset.codigo || '-';
+        }
+
+        deleteModalForm.action = triggerElement.dataset.action || '';
+
+        if (deleteInput) {
+            deleteInput.value = '';
+        }
+
+        syncDeleteConfirmState();
+        deleteModal.show();
+    }
+
+    function attachDeleteEvents() {
+        if (!deleteModal || !deleteConfirmBtn || !deleteInput) return;
+
+        document.querySelectorAll('.salud-delete-trigger').forEach((buttonElement) => {
+            buttonElement.addEventListener('click', () => {
+                abrirModalEliminar(buttonElement);
+            });
+        });
+    }
+
     function renderAcciones(ficha) {
         if (!mostrarAcciones) return '';
 
@@ -302,17 +375,15 @@
                     <a href="${ficha.historial_url}" class="btn-accion btn-historial" title="Historial">
                         <i class="bi bi-clock-history"></i>
                     </a>
-                    <a href="${ficha.edit_url}" class="btn-accion btn-editar" title="Editar">
-                        <i class="bi bi-pencil"></i>
-                    </a>
-                    ${puedeGestionarTodo ? `
-                        <form method="POST" action="${ficha.delete_url}" class="inline-form" onsubmit="return confirm('Seguro que quieres eliminar este registro de salud?');">
-                            <input type="hidden" name="_token" value="${csrf}">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button type="submit" class="btn-accion btn-borrar" title="Borrar">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
+                    ${puedeEditarFicha ? `
+                        <a href="${ficha.edit_url}" class="btn-accion btn-editar" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    ` : ''}
+                    ${puedeBorrarFicha ? `
+                        <button type="button" class="btn-accion btn-borrar salud-delete-trigger" title="Borrar" data-action="${ficha.delete_url}" data-codigo="${escapeHtml(ficha.codigo_animal)}">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     ` : ''}
                 </div>
             </td>
@@ -347,6 +418,8 @@
                 </tr>
             `;
         }).join('');
+
+        attachDeleteEvents();
     }
 
     async function cargarSalud() {
@@ -390,6 +463,21 @@
             cargarSalud();
         }, 0);
     });
+
+    if (deleteInput) {
+        deleteInput.addEventListener('input', syncDeleteConfirmState);
+    }
+
+    if (deleteModalForm) {
+        deleteModalForm.addEventListener('submit', (event) => {
+            if (deleteInput.value.trim().toUpperCase() === 'ELIMINAR') return;
+
+            event.preventDefault();
+            syncDeleteConfirmState();
+        });
+    }
+
+    attachDeleteEvents();
 })();
 </script>
 @endpush

@@ -31,7 +31,8 @@ class PiensoController extends Controller
         $q = trim((string) $request->query('q', ''));
         $estado = trim((string) $request->query('estado', ''));
 
-        $consulta = Pienso::query();
+        $consulta = Pienso::query()
+            ->withCount(['animalesRecomendados', 'alimentaciones']);
 
         if ($q !== '') {
             $consulta->where('nombre', 'like', '%' . $q . '%');
@@ -128,6 +129,28 @@ class PiensoController extends Controller
         return redirect()->route('pienso.index')->with('ok', 'Pienso actualizado correctamente');
     }
 
+    public function destroy($id)
+    {
+        if (!$this->puedeGestionar()) {
+            return $this->denegado('gestionar_pienso');
+        }
+
+        $pienso = Pienso::withCount(['animalesRecomendados', 'alimentaciones'])->find($id);
+        if (!$pienso) {
+            abort(404);
+        }
+
+        if ($pienso->animales_recomendados_count > 0 || $pienso->alimentaciones_count > 0) {
+            return redirect()
+                ->route('pienso.index')
+                ->withErrors(['pienso' => 'No se puede eliminar un pienso asociado a animales o registros de alimentacion.']);
+        }
+
+        $pienso->delete();
+
+        return redirect()->route('pienso.index')->with('ok', 'Pienso eliminado correctamente');
+    }
+
     public function apiListado(Request $request)
     {
         if (!$this->puedeGestionar()) {
@@ -145,7 +168,11 @@ class PiensoController extends Controller
                     'id_pienso' => $pienso->id_pienso,
                     'nombre' => $pienso->nombre,
                     'activo' => (bool) $pienso->activo,
+                    'animales_count' => (int) $pienso->animales_recomendados_count,
+                    'alimentaciones_count' => (int) $pienso->alimentaciones_count,
+                    'can_delete' => $pienso->animales_recomendados_count === 0 && $pienso->alimentaciones_count === 0,
                     'edit_url' => route('pienso.edit', $pienso->id_pienso),
+                    'delete_url' => route('pienso.destroy', $pienso->id_pienso),
                 ])
                 ->values(),
         ]);

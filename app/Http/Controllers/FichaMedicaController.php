@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 
 class FichaMedicaController extends Controller
 {
+    // Respuesta comun para accesos denegados por permisos.
     private function denegado(string $permiso)
     {
         $priv = Privilegio::where('nombre', $permiso)->first();
@@ -23,36 +24,44 @@ class FichaMedicaController extends Controller
         ], 403);
     }
 
+    // Permite diagnostico, tratamiento y edicion clinica completa.
     private function puedeGestionarTodo(): bool
     {
-        $usuario = auth()->user();
-
-        // La gestion clinica completa queda limitada a los roles sanitarios o admin.
-        return $usuario->esAdministrador() || $usuario->esRol('veterinario');
+        return auth()->check()
+            && auth()->user()->tienePrivilegio('gestionar_ficha_medica_completa');
     }
 
+    // Permite crear una revision; el alcance se decide por privilegios adicionales.
     private function puedeCrearRevision(): bool
     {
-        $usuario = auth()->user();
-
-        return $this->puedeGestionarTodo()
-            || $usuario->esRol('supervisor')
-            || $usuario->esRol('operario');
+        return auth()->check()
+            && auth()->user()->tienePrivilegio('crear_ficha_medica');
     }
 
+    // Permite editar observaciones aunque no se tenga acceso clinico completo.
     private function puedeEditarObservaciones(): bool
     {
         return $this->puedeGestionarTodo()
-            || auth()->user()->tienePrivilegio('editar_observaciones_ficha_medica');
+            || (
+                auth()->check()
+                && auth()->user()->tienePrivilegio('editar_observaciones_ficha_medica')
+            );
     }
 
+    // Permite eliminar fichas medicas.
+    private function puedeBorrarFicha(): bool
+    {
+        return auth()->check()
+            && auth()->user()->tienePrivilegio('borrar_ficha_medica');
+    }
+
+    // Calcula el estado visual de la ficha a partir de los campos existentes.
     private function estadoFicha($ficha): array
     {
         $diagnostico = trim((string) data_get($ficha, 'diagnostico', ''));
         $tratamiento = trim((string) data_get($ficha, 'tratamiento', ''));
         $observaciones = trim((string) data_get($ficha, 'observaciones', ''));
 
-        // No se anade una columna de estado: se deriva de los campos ya existentes.
         if ($diagnostico !== '' || $tratamiento !== '') {
             return ['texto' => 'Con tratamiento', 'clase' => 'medical-pill-success'];
         }
@@ -64,6 +73,7 @@ class FichaMedicaController extends Controller
         return ['texto' => 'Pendiente', 'clase' => 'medical-pill-muted'];
     }
 
+    // Consulta base reutilizable para el listado HTML y para la API asincrona.
     private function construirConsulta(Request $request)
     {
         $q = trim((string) $request->query('q', ''));
@@ -84,6 +94,7 @@ class FichaMedicaController extends Controller
             ->leftJoin('usuario', 'ficha_medica.id_usuario', '=', 'usuario.id_usuario')
             ->select('ficha_medica.*');
 
+        // Busqueda general sobre animal, ficha y responsable.
         if ($q !== '') {
             $consulta->where(function ($query) use ($q) {
                 $query->where('animal.codigo', 'like', '%' . $q . '%')
@@ -97,6 +108,7 @@ class FichaMedicaController extends Controller
             });
         }
 
+        // Filtros especificos por fecha, animal, campos medicos y responsable.
         if ($fecha !== '') {
             $consulta->whereDate('ficha_medica.fecha', $fecha);
         }
@@ -136,6 +148,7 @@ class FichaMedicaController extends Controller
             $consulta->where('ficha_medica.id_usuario', $usuario);
         }
 
+        // Estado derivado: pendiente no tiene diagnostico, tratamiento ni observaciones.
         if ($estado === 'pendiente') {
             $consulta->where(function ($query) {
                 $query->whereNull('ficha_medica.diagnostico')->orWhere('ficha_medica.diagnostico', '');
@@ -146,6 +159,7 @@ class FichaMedicaController extends Controller
             });
         }
 
+        // Estado derivado: seguimiento solo tiene observaciones.
         if ($estado === 'seguimiento') {
             $consulta->where(function ($query) {
                 $query->whereNull('ficha_medica.diagnostico')->orWhere('ficha_medica.diagnostico', '');
@@ -155,6 +169,7 @@ class FichaMedicaController extends Controller
                 ->where('ficha_medica.observaciones', '<>', '');
         }
 
+        // Estado derivado: tratamiento si hay diagnostico o tratamiento informado.
         if ($estado === 'tratamiento') {
             $consulta->where(function ($query) {
                 $query->whereNotNull('ficha_medica.diagnostico')->where('ficha_medica.diagnostico', '<>', '')
@@ -167,6 +182,7 @@ class FichaMedicaController extends Controller
         return $consulta->orderByDesc('ficha_medica.fecha')->orderByDesc('ficha_medica.id_ficha');
     }
 
+    // Calcula los contadores superiores del modulo de salud.
     private function resumen(): array
     {
         $total = FichaMedica::count();
@@ -193,6 +209,7 @@ class FichaMedicaController extends Controller
         ];
     }
 
+    // Valida los datos comunes de una ficha medica completa.
     private function validarFicha(Request $request): array
     {
         return $request->validate([
@@ -204,6 +221,7 @@ class FichaMedicaController extends Controller
         ]);
     }
 
+    // Listado principal de salud con permisos, filtros, resumenes y datos auxiliares.
     public function index(Request $request)
     {
         if (!auth()->user()->tienePrivilegio('ver_ficha_medica')) {
@@ -233,10 +251,12 @@ class FichaMedicaController extends Controller
             'puedeCrear' => $this->puedeCrearRevision(),
             'puedeGestionarTodo' => $this->puedeGestionarTodo(),
             'puedeEditarObservaciones' => $this->puedeEditarObservaciones(),
+            'puedeBorrarFicha' => $this->puedeBorrarFicha(),
             'estadoFicha' => fn ($ficha) => $this->estadoFicha($ficha),
         ]);
     }
 
+    // Muestra el formulario para crear una nueva revision o ficha medica.
     public function create()
     {
         if (!$this->puedeCrearRevision()) {
@@ -249,6 +269,7 @@ class FichaMedicaController extends Controller
         ]);
     }
 
+    // Guarda una ficha nueva; sin gestion completa solo registra observaciones.
     public function store(Request $request)
     {
         if (!$this->puedeCrearRevision()) {
@@ -258,7 +279,7 @@ class FichaMedicaController extends Controller
         $data = $this->validarFicha($request);
         $data['id_usuario'] = auth()->user()->id_usuario;
 
-        // Supervisor y operario solo dejan una revision pendiente o de seguimiento.
+        // Quien no tiene gestion completa deja una revision pendiente o de seguimiento.
         if (!$this->puedeGestionarTodo()) {
             $data['diagnostico'] = null;
             $data['tratamiento'] = null;
@@ -269,6 +290,7 @@ class FichaMedicaController extends Controller
         return redirect()->route('salud.index')->with('ok', 'Registro de salud creado correctamente');
     }
 
+    // Muestra el formulario de edicion completa o solo observaciones segun permisos.
     public function edit($id)
     {
         if (!$this->puedeGestionarTodo() && !$this->puedeEditarObservaciones()) {
@@ -284,6 +306,7 @@ class FichaMedicaController extends Controller
         ]);
     }
 
+    // Actualiza una ficha; gestion completa edita todo y el resto solo observaciones.
     public function update(Request $request, $id)
     {
         if (!$this->puedeGestionarTodo() && !$this->puedeEditarObservaciones()) {
@@ -307,10 +330,11 @@ class FichaMedicaController extends Controller
         return redirect()->route('salud.index')->with('ok', 'Registro de salud actualizado correctamente');
     }
 
+    // Elimina una ficha medica.
     public function destroy($id)
     {
-        if (!$this->puedeGestionarTodo()) {
-            return $this->denegado('editar_ficha_medica');
+        if (!$this->puedeBorrarFicha()) {
+            return $this->denegado('borrar_ficha_medica');
         }
 
         FichaMedica::findOrFail($id)->delete();
@@ -318,6 +342,7 @@ class FichaMedicaController extends Controller
         return redirect()->route('salud.index')->with('ok', 'Registro de salud eliminado correctamente');
     }
 
+    // Devuelve el listado filtrado en JSON para actualizar la tabla sin recargar la pagina.
     public function apiListado(Request $request)
     {
         if (!auth()->user()->tienePrivilegio('ver_ficha_medica')) {

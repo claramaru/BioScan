@@ -58,6 +58,12 @@
 @endphp
 
 <main class="main-wrap">
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            {{ $errors->first() }}
+        </div>
+    @endif
+
     <div class="top-bar">
         <div class="page-title">Cebaderos</div>
         <div class="d-flex gap-2 align-items-center flex-wrap">
@@ -201,7 +207,14 @@
                                         </a>
                                     @endif
                                     @if(!empty($puedeBorrar) && $puedeBorrar)
-                                        <button type="button" class="btn-accion btn-borrar" title="Eliminar" disabled>
+                                        <button
+                                            type="button"
+                                            class="btn-accion btn-borrar js-borrar-cebadero"
+                                            title="Eliminar"
+                                            data-delete-url="{{ route('cebadero.destroy', $cebadero['id_cebadero']) }}"
+                                            data-nombre="{{ $cebadero['nombre'] }}"
+                                            @disabled($cebadero['animales_count'] > 0)
+                                        >
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     @endif
@@ -220,6 +233,35 @@
         </table>
         </form>
     </div>
+
+    @if(!empty($puedeBorrar) && $puedeBorrar)
+        <div class="modal fade" id="modalEliminarCebadero" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <form method="POST" id="delete-cebadero-modal-form">
+                    @csrf
+                    @method('DELETE')
+                    <div class="modal-content animal-delete-modal">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirmar eliminacion</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="animal-delete-word">ELIMINAR</div>
+                            <p class="animal-delete-copy mb-2">Vas a borrar el cebadero <strong id="delete-cebadero-name">-</strong>.</p>
+                            <p class="animal-delete-copy mb-3">Escribe <strong>ELIMINAR</strong> para confirmar.</p>
+                            <input type="text" id="delete-cebadero-confirm-input" class="form-control animal-delete-input" autocomplete="off" placeholder="Escribe ELIMINAR">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="animals-top-btn animals-top-btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" id="confirm-delete-cebadero-btn" class="animals-top-btn animals-top-btn-primary" disabled>
+                                <i class="bi bi-trash me-1"></i>Eliminar cebadero
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
 </main>
 @endsection
 
@@ -240,7 +282,14 @@
     const colspan = mostrarAcciones ? 6 : 5;
     const urls = {
         editar: @json(url('/cebaderos/__ID__/edit')),
+        borrar: @json(url('/cebaderos/__ID__')),
     };
+    const deleteModalElement = document.getElementById('modalEliminarCebadero');
+    const deleteModal = deleteModalElement ? new bootstrap.Modal(deleteModalElement) : null;
+    const deleteModalForm = document.getElementById('delete-cebadero-modal-form');
+    const deleteName = document.getElementById('delete-cebadero-name');
+    const deleteInput = document.getElementById('delete-cebadero-confirm-input');
+    const deleteConfirmBtn = document.getElementById('confirm-delete-cebadero-btn');
     // Se reutiliza para no lanzar una peticion por cada tecla.
     let debounceId = null;
 
@@ -299,6 +348,8 @@
             const estadoClase = escapeHtml(cebadero.estado_clase || 'estado-vacio');
             const estadoTexto = escapeHtml(cebadero.estado || 'Sin datos');
             const editarUrl = urls.editar.replace('__ID__', cebadero.id_cebadero);
+            const borrarUrl = escapeHtml(cebadero.delete_url || urls.borrar.replace('__ID__', cebadero.id_cebadero));
+            const puedeEliminarFila = Number(cebadero.animales_count ?? 0) === 0;
             const accionesHtml = mostrarAcciones
                 ? `
                     <td class="td-acciones">
@@ -309,7 +360,14 @@
                                 </a>
                             ` : ''}
                             ${puedeBorrar ? `
-                                <button type="button" class="btn-accion btn-borrar" title="Eliminar" disabled>
+                                <button
+                                    type="button"
+                                    class="btn-accion btn-borrar js-borrar-cebadero"
+                                    title="Eliminar"
+                                    data-delete-url="${borrarUrl}"
+                                    data-nombre="${nombre}"
+                                    ${puedeEliminarFila ? '' : 'disabled'}
+                                >
                                     <i class="bi bi-trash"></i>
                                 </button>
                             ` : ''}
@@ -340,6 +398,32 @@
                 </tr>
             `;
         }).join('');
+    }
+
+    function syncDeleteConfirmState() {
+        if (!deleteConfirmBtn || !deleteInput) return;
+        deleteConfirmBtn.disabled = deleteInput.value.trim().toUpperCase() !== 'ELIMINAR';
+    }
+
+    function abrirModalEliminar(button) {
+        const deleteUrl = button.dataset.deleteUrl;
+
+        if (!deleteUrl || !deleteModal || !deleteModalForm) {
+            return;
+        }
+
+        if (deleteName) {
+            deleteName.textContent = button.dataset.nombre || '-';
+        }
+
+        deleteModalForm.action = deleteUrl;
+
+        if (deleteInput) {
+            deleteInput.value = '';
+        }
+
+        syncDeleteConfirmState();
+        deleteModal.show();
     }
 
     async function cargarCebaderos() {
@@ -387,6 +471,28 @@
         event.preventDefault();
         cargarCebaderos();
     });
+
+    document.addEventListener('click', (event) => {
+        const button = event.target.closest('.js-borrar-cebadero');
+        if (!button || button.disabled) {
+            return;
+        }
+
+        abrirModalEliminar(button);
+    });
+
+    if (deleteInput) {
+        deleteInput.addEventListener('input', syncDeleteConfirmState);
+    }
+
+    if (deleteModalForm) {
+        deleteModalForm.addEventListener('submit', (event) => {
+            if (deleteInput.value.trim().toUpperCase() === 'ELIMINAR') return;
+
+            event.preventDefault();
+            syncDeleteConfirmState();
+        });
+    }
 
     form.querySelectorAll('input, select').forEach((field) => {
         const eventName = field.tagName === 'SELECT' ? 'change' : 'input';

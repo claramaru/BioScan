@@ -37,8 +37,7 @@ class NewPasswordController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Aqui Laravel comprueba si el token sigue siendo valido y, si lo es,
-        // actualiza la contraseña del usuario que corresponde a ese correo.
+        // Laravel comprueba si el token sigue siendo valido y, si lo es, actualiza la contraseña del usuario que corresponde a ese correo.
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user) use ($request) {
@@ -56,8 +55,7 @@ class NewPasswordController extends Controller
             }
         );
 
-        // Si todo sale bien se vuelve al login.
-        // Si falla, se mantiene el email y se enseña el error.
+        // Si todo sale bien se vuelve al login. Si falla, se mantiene el email y se enseña el error.
         return $status == Password::PASSWORD_RESET
                     ? redirect()->route('login')->with('status', __($status))
                     : back()->withInput($request->only('email'))

@@ -91,6 +91,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Guardar cambios del cebadero.
     Route::put('/cebaderos/{id}', [CebaderoController::class, 'update'])->name('cebadero.update');
 
+    // Eliminar cebadero.
+    Route::delete('/cebaderos/{id}', [CebaderoController::class, 'destroy'])->name('cebadero.destroy');
+
     // Vista principal de alimentacion.
     Route::get('/alimentacion', [AlimentacionController::class, 'index'])->name('alimentacion.index');
 
@@ -100,6 +103,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/piensos', [PiensoController::class, 'store'])->name('pienso.store');
     Route::get('/piensos/{id}/edit', [PiensoController::class, 'edit'])->name('pienso.edit');
     Route::put('/piensos/{id}', [PiensoController::class, 'update'])->name('pienso.update');
+    Route::delete('/piensos/{id}', [PiensoController::class, 'destroy'])->name('pienso.destroy');
 
     // Formulario para crear un registro de alimentacion.
     Route::get('/alimentacion/create', [AlimentacionController::class, 'create'])->name('alimentacion.create');
