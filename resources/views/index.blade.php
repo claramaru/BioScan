@@ -16,7 +16,6 @@
     <div class="row g-3 mb-3">
         <div class="col-lg-3 col-md-6">
             <div class="stat-card">
-                <span class="badge-trend trend-neutral bt-abs" id="pct-animales">-</span>
                 <div class="d-flex gap-2 mb-2">
                     <div class="card-icon" style="background:#fce7f3;">
                         <img src="{{ asset('images/cerdo.png') }}" alt="Porcino">
@@ -181,7 +180,6 @@ async function loadStats(){
     document.getElementById('cebaderos-activos').textContent=d.cebaderos_activos;
     document.getElementById('cebaderos-total').textContent=d.total_cebaderos;
     document.getElementById('tratamientos-activos').textContent=d.tratamientos_activos;
-    badgeTrend(d.pct_animales,'pct-animales');
     badgeTrend(d.pct_tratamientos,'pct-tratamientos');
 
     const slides=document.getElementById('pienso-slides');

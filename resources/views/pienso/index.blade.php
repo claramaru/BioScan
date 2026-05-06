@@ -31,6 +31,12 @@
         </div>
     @endif
 
+    @if($errors->any())
+        <div class="alert alert-danger">
+            {{ $errors->first() }}
+        </div>
+    @endif
+
     <div class="table-card">
         <div class="tc-header d-flex justify-content-between align-items-start gap-3 flex-wrap">
             <div class="tabla-titulo-wrap">
@@ -91,6 +97,18 @@
                                 <a href="{{ route('pienso.edit', $pienso->id_pienso) }}" class="btn-accion btn-editar" title="Editar">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+                                <button
+                                    type="button"
+                                    class="btn-accion btn-borrar pienso-delete-trigger"
+                                    title="Borrar"
+                                    data-action="{{ route('pienso.destroy', $pienso->id_pienso) }}"
+                                    data-nombre="{{ $pienso->nombre ?: 'Sin nombre' }}"
+                                    data-can-delete="{{ (($pienso->animales_recomendados_count ?? 0) === 0 && ($pienso->alimentaciones_count ?? 0) === 0) ? '1' : '0' }}"
+                                    data-animales="{{ $pienso->animales_recomendados_count ?? 0 }}"
+                                    data-alimentaciones="{{ $pienso->alimentaciones_count ?? 0 }}"
+                                >
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -102,6 +120,52 @@
                 </tbody>
             </table>
         </form>
+    </div>
+
+    <div class="modal fade" id="modalEliminarPienso" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST" id="delete-pienso-modal-form">
+                @csrf
+                @method('DELETE')
+                <div class="modal-content animal-delete-modal">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar eliminacion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="animal-delete-word">ELIMINAR</div>
+                        <p class="animal-delete-copy mb-2">Vas a borrar el pienso <strong id="delete-pienso-name">-</strong>.</p>
+                        <p class="animal-delete-copy mb-3">Escribe <strong>ELIMINAR</strong> para confirmar.</p>
+                        <input type="text" id="delete-pienso-confirm-input" class="form-control animal-delete-input" autocomplete="off" placeholder="Escribe ELIMINAR">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="animals-top-btn animals-top-btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="confirm-delete-pienso-btn" class="animals-top-btn animals-top-btn-primary" disabled>
+                            <i class="bi bi-trash me-1"></i>Eliminar pienso
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalPiensoAsociado" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content animal-delete-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title">No se puede eliminar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="animal-delete-word">ASOCIADO</div>
+                    <p class="animal-delete-copy mb-2">El pienso <strong id="pienso-asociado-name">-</strong> no se puede borrar porque esta en uso.</p>
+                    <p class="animal-delete-copy mb-0" id="pienso-asociado-detail">Hay animales o registros de alimentacion asociados.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="animals-top-btn animals-top-btn-secondary" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
     </div>
 </main>
 @endsection
@@ -116,6 +180,16 @@
     const estado = document.getElementById('estado-filtros');
     const limpiar = document.getElementById('limpiar-filtros');
     const baseUrl = @json(route('api.pienso.index'));
+    const deleteModalElement = document.getElementById('modalEliminarPienso');
+    const deleteModal = deleteModalElement ? new bootstrap.Modal(deleteModalElement) : null;
+    const deleteModalForm = document.getElementById('delete-pienso-modal-form');
+    const deleteName = document.getElementById('delete-pienso-name');
+    const deleteInput = document.getElementById('delete-pienso-confirm-input');
+    const deleteConfirmBtn = document.getElementById('confirm-delete-pienso-btn');
+    const associatedModalElement = document.getElementById('modalPiensoAsociado');
+    const associatedModal = associatedModalElement ? new bootstrap.Modal(associatedModalElement) : null;
+    const associatedName = document.getElementById('pienso-asociado-name');
+    const associatedDetail = document.getElementById('pienso-asociado-detail');
     let debounceId = null;
 
     function escapeHtml(value) {
@@ -142,6 +216,57 @@
         window.history.replaceState({}, '', next);
     }
 
+    function syncDeleteConfirmState() {
+        if (!deleteConfirmBtn || !deleteInput) return;
+        deleteConfirmBtn.disabled = deleteInput.value.trim().toUpperCase() !== 'ELIMINAR';
+    }
+
+    function abrirModalEliminar(triggerElement) {
+        if (!deleteModal || !deleteModalForm) return;
+
+        if (deleteName) {
+            deleteName.textContent = triggerElement.dataset.nombre || '-';
+        }
+
+        deleteModalForm.action = triggerElement.dataset.action || '';
+
+        if (deleteInput) {
+            deleteInput.value = '';
+        }
+
+        syncDeleteConfirmState();
+        deleteModal.show();
+    }
+
+    function mostrarAlertaAsociado(triggerElement) {
+        if (!associatedModal) return;
+
+        const nombre = triggerElement.dataset.nombre || '-';
+        const animales = Number(triggerElement.dataset.animales || 0);
+        const alimentaciones = Number(triggerElement.dataset.alimentaciones || 0);
+        const partes = [];
+
+        if (animales > 0) {
+            partes.push(`${animales} animal${animales === 1 ? '' : 'es'} asociado${animales === 1 ? '' : 's'}`);
+        }
+
+        if (alimentaciones > 0) {
+            partes.push(`${alimentaciones} registro${alimentaciones === 1 ? '' : 's'} de alimentacion`);
+        }
+
+        if (associatedName) {
+            associatedName.textContent = nombre;
+        }
+
+        if (associatedDetail) {
+            associatedDetail.textContent = partes.length
+                ? `Tiene ${partes.join(' y ')}.`
+                : 'Hay animales o registros de alimentacion asociados.';
+        }
+
+        associatedModal.show();
+    }
+
     function renderTabla(piensos) {
         contador.textContent = Array.isArray(piensos) ? piensos.length : 0;
 
@@ -163,6 +288,18 @@
                         <a href="${pienso.edit_url}" class="btn-accion btn-editar" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </a>
+                        <button
+                            type="button"
+                            class="btn-accion btn-borrar pienso-delete-trigger"
+                            title="Borrar"
+                            data-action="${pienso.delete_url}"
+                            data-nombre="${escapeHtml(pienso.nombre || 'Sin nombre')}"
+                            data-can-delete="${pienso.can_delete ? '1' : '0'}"
+                            data-animales="${pienso.animales_count ?? 0}"
+                            data-alimentaciones="${pienso.alimentaciones_count ?? 0}"
+                        >
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -199,6 +336,20 @@
         cargarPiensos();
     });
 
+    document.addEventListener('click', (event) => {
+        const button = event.target.closest('.pienso-delete-trigger');
+        if (!button) {
+            return;
+        }
+
+        if (button.dataset.canDelete !== '1') {
+            mostrarAlertaAsociado(button);
+            return;
+        }
+
+        abrirModalEliminar(button);
+    });
+
     form.querySelectorAll('input, select').forEach((field) => {
         const eventName = field.tagName === 'SELECT' ? 'change' : 'input';
         field.addEventListener(eventName, programarCarga);
@@ -210,6 +361,19 @@
             cargarPiensos();
         }, 0);
     });
+
+    if (deleteInput) {
+        deleteInput.addEventListener('input', syncDeleteConfirmState);
+    }
+
+    if (deleteModalForm) {
+        deleteModalForm.addEventListener('submit', (event) => {
+            if (deleteInput.value.trim().toUpperCase() === 'ELIMINAR') return;
+
+            event.preventDefault();
+            syncDeleteConfirmState();
+        });
+    }
 })();
 </script>
 @endpush

@@ -25,6 +25,12 @@ class PrivilegioSeeder extends Seeder
             ['id_privilegio' => 13, 'nombre' => 'gestionar_usuario', 'descripcion' => 'Gestionar usuarios'],
             ['id_privilegio' => 14, 'nombre' => 'gestionar_rol', 'descripcion' => 'Gestionar roles y privilegios'],
             ['id_privilegio' => 15, 'nombre' => 'gestionar_pienso', 'descripcion' => null],
+            ['id_privilegio' => 16, 'nombre' => 'ver_cebadero', 'descripcion' => 'Ver cebaderos'],
+            ['id_privilegio' => 17, 'nombre' => 'crear_cebadero', 'descripcion' => 'Crear cebaderos'],
+            ['id_privilegio' => 18, 'nombre' => 'editar_cebadero', 'descripcion' => 'Editar cebaderos'],
+            ['id_privilegio' => 19, 'nombre' => 'borrar_cebadero', 'descripcion' => 'Eliminar cebaderos'],
+            ['id_privilegio' => 20, 'nombre' => 'borrar_ficha_medica', 'descripcion' => 'Eliminar fichas medicas'],
+            ['id_privilegio' => 21, 'nombre' => 'gestionar_ficha_medica_completa', 'descripcion' => 'Gestionar diagnostico y tratamiento'],
         ], ['id_privilegio'], ['nombre', 'descripcion']);
     }
 }

@@ -7,15 +7,13 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    // Carga la vista principal del dashboard.
-    // Los bloques dinamicos se rellenan despues con fetch() desde el frontend.
+    // Carga la vista principal; las tarjetas y tablas se completan luego por fetch().
     public function index()
     {
         return view('index');
     }
 
-    // Devuelve las metricas principales de las tarjetas superiores.
-    // Aqui se concentran los totales y comparativas que luego pinta el dashboard.
+    // Devuelve las metricas principales que pintan las tarjetas superiores del dashboard.
     public function stats()
     {
         $ahora = Carbon::now();
@@ -43,8 +41,7 @@ class DashboardController extends Controller
 
         $totalCebaderos = DB::table('cebadero')->count();
 
-        // Media de cantidad de pienso por especie.
-        // Se formatea aqui mismo para que el frontend lo consuma ya listo.
+        // Media de pienso por especie, ya formateada para que el frontend la pinte directamente.
         $piensoEspecies = DB::table('alimentacion')
             ->join('animal', 'alimentacion.id_animal', '=', 'animal.id_animal')
             ->select('animal.especie', DB::raw('AVG(alimentacion.cantidad) as promedio'))
@@ -75,19 +72,8 @@ class DashboardController extends Controller
             ? round((($tratamientosActivos - $tratamientosMesAnterior) / $tratamientosMesAnterior) * 100, 1)
             : null;
 
-        // Mismo enfoque para comparar altas de animales entre meses.
-        $animalesMes = DB::table('animal')->where('fecha_alta', '>=', $inicioMes)->count();
-        $animalesMesAnterior = DB::table('animal')
-            ->whereBetween('fecha_alta', [$inicioMesAnterior, $finMesAnterior])
-            ->count();
-
-        $pctAnimales = $animalesMesAnterior > 0
-            ? round((($animalesMes - $animalesMesAnterior) / $animalesMesAnterior) * 100, 1)
-            : null;
-
         return response()->json([
             'total_animales' => $totalAnimales,
-            'pct_animales' => $pctAnimales,
             'especies' => $especiesRaw,
             'cebaderos_activos' => $cebaderosActivos,
             'total_cebaderos' => $totalCebaderos,
@@ -97,7 +83,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    // Devuelve los ultimos animales incorporados para la tabla lateral del dashboard.
+    // Devuelve los ultimos animales incorporados con un estado medico resumido.
     public function animalesRecientes()
     {
         $ultimaFichaPorAnimal = DB::table('ficha_medica')
@@ -134,7 +120,7 @@ class DashboardController extends Controller
         return response()->json($animales);
     }
 
-    // Mezcla alimentacion y ficha medica para mostrar una actividad reciente unica.
+    // Combina alimentacion y ficha medica en una sola lista cronologica de actividad reciente.
     public function actividadReciente()
     {
         // Cargamos cada fuente por separado para evitar choques de collation en MySQL
@@ -171,7 +157,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Unimos ambas fuentes ya en PHP para conservar una sola lista cronologica
+        // Unimos ambas fuentes en PHP para conservar una sola lista cronologica
         // sin depender de UNION SQL entre collations heterogeneas.
         $actividad = $alimentaciones
             ->concat($fichas)
@@ -184,7 +170,7 @@ class DashboardController extends Controller
         return response()->json($actividad);
     }
 
-    // Resume cada cebadero con numero de animales y media de pienso.
+    // Resume cada cebadero con numero de animales y media de pienso para el grafico.
     public function estadisticasCebadero()
     {
         $cebaderos = DB::table('cebadero')

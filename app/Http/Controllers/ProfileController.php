@@ -12,9 +12,7 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
+    // Muestra la pantalla de perfil del usuario autenticado.
     public function edit(Request $request): View
     {
         return view('profile.edit', [
@@ -22,13 +20,12 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
+    // Actualiza los datos personales del propio usuario.
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
 
+        // Si cambia el correo, se invalida la verificacion solo si la tabla tiene esa columna.
         if (
             $request->user()->isDirty('email')
             && Schema::hasColumn($request->user()->getTable(), 'email_verified_at')
@@ -41,9 +38,7 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
-    /**
-     * Delete the user's account.
-     */
+    // Elimina la cuenta propia tras confirmar la contrasena actual.
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [

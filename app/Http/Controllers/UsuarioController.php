@@ -4,27 +4,31 @@ namespace App\Http\Controllers;
 
 use App\Models\Rol;
 use App\Models\User;
+use App\Models\Privilegio;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class UsuarioController extends Controller
 {
-    // Reutilizamos la misma vista de acceso denegado para mantener coherencia.
-    private function denegado()
+    // Respuesta comun para accesos denegados por permisos.
+    private function denegado(string $permiso)
     {
+        $priv = Privilegio::where('nombre', $permiso)->first();
+        $rolesPermitidos = $priv ? $priv->roles()->pluck('nombre')->toArray() : [];
+
         return response()->view('acceso_denegado', [
             'permitido' => false,
-            'permiso' => 'administrador',
-            'rolesPermitidos' => ['administrador'],
+            'permiso' => $permiso,
+            'rolesPermitidos' => $rolesPermitidos,
             'mensaje' => null,
         ], 403);
     }
 
-    // Toda la gestion de usuarios queda reservada a administradores.
-    private function asegurarAdministrador()
+    // Toda la gestion de usuarios se controla con el privilegio correspondiente.
+    private function asegurarGestionUsuarios()
     {
-        if (!auth()->check() || !auth()->user()->esAdministrador()) {
-            return $this->denegado();
+        if (!auth()->check() || !auth()->user()->tienePrivilegio('gestionar_usuario')) {
+            return $this->denegado('gestionar_usuario');
         }
 
         return null;
@@ -54,7 +58,7 @@ class UsuarioController extends Controller
     // Listado de usuarios con filtros por texto y por rol.
     public function index(Request $request)
     {
-        if ($respuesta = $this->asegurarAdministrador()) {
+        if ($respuesta = $this->asegurarGestionUsuarios()) {
             return $respuesta;
         }
 
@@ -81,7 +85,7 @@ class UsuarioController extends Controller
 
     public function data(Request $request)
     {
-        if ($respuesta = $this->asegurarAdministrador()) {
+        if ($respuesta = $this->asegurarGestionUsuarios()) {
             return $respuesta;
         }
 
@@ -98,7 +102,7 @@ class UsuarioController extends Controller
     // Alta de usuario desde el panel de administracion.
     public function store(Request $request)
     {
-        if ($respuesta = $this->asegurarAdministrador()) {
+        if ($respuesta = $this->asegurarGestionUsuarios()) {
             return $respuesta;
         }
 
@@ -126,7 +130,7 @@ class UsuarioController extends Controller
     // Permite editar datos generales, rol y password opcionalmente.
     public function update(Request $request, $id)
     {
-        if ($respuesta = $this->asegurarAdministrador()) {
+        if ($respuesta = $this->asegurarGestionUsuarios()) {
             return $respuesta;
         }
 
@@ -169,7 +173,7 @@ class UsuarioController extends Controller
     // Borrado definitivo. Se bloquea la autoeliminacion para evitar perder el acceso admin activo.
     public function destroy($id)
     {
-        if ($respuesta = $this->asegurarAdministrador()) {
+        if ($respuesta = $this->asegurarGestionUsuarios()) {
             return $respuesta;
         }
 
