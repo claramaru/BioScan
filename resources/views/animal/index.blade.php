@@ -489,7 +489,11 @@
 
     function formatFecha(fecha) {
         if (!fecha) return '-';
-        const [year, month, day] = fecha.split('-');
+
+        const match = String(fecha).match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (!match) return fecha;
+
+        const [, year, month, day] = match;
         return year && month && day ? `${day}/${month}/${year}` : fecha;
     }
 
@@ -872,4 +876,3 @@
 })();
 </script>
 @endpush
-

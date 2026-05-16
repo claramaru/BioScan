@@ -378,7 +378,7 @@ class AnimalController extends Controller
                 'raza' => $animal->raza,
                 'pienso_recomendado' => $animal->piensoRecomendado?->nombre,
                 'lote' => $animal->lote,
-                'fecha_alta' => $animal->fecha_alta,
+                'fecha_alta' => $animal->fecha_alta?->toDateString(),
                 'observaciones' => $animal->observaciones,
                 'cebadero' => [
                     'id_cebadero' => $animal->cebadero->id_cebadero ?? null,
@@ -413,7 +413,7 @@ class AnimalController extends Controller
                     'id_pienso_recomendado' => $animal->id_pienso_recomendado,
                     'tipo_pienso_recomendado' => $animal->piensoRecomendado?->nombre,
                     'lote' => $animal->lote,
-                    'fecha_alta' => $animal->fecha_alta,
+                    'fecha_alta' => $animal->fecha_alta?->toDateString(),
                     'observaciones' => $animal->observaciones,
                     'cebadero' => [
                         'id_cebadero' => $animal->cebadero->id_cebadero ?? null,
@@ -616,4 +616,3 @@ class AnimalController extends Controller
         return redirect()->route('animal.index')->with('ok', 'Animal eliminado correctamente de manera satisfactoria');
     }
 }
-

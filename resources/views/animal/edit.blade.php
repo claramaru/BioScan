@@ -76,7 +76,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label-custom">Fecha de alta <span class="required-dot">*</span></label>
-                            <input type="date" name="fecha_alta" id="f-fecha" oninput="syncPreview()" class="form-control-custom {{ $errors->has('fecha_alta') ? 'is-invalid' : '' }}" value="{{ old('fecha_alta', data_get($animal, 'fecha_alta')) }}">
+                            <input type="date" name="fecha_alta" id="f-fecha" oninput="syncPreview()" class="form-control-custom {{ $errors->has('fecha_alta') ? 'is-invalid' : '' }}" value="{{ old('fecha_alta', data_get($animal, 'fecha_alta')?->format('Y-m-d')) }}">
                             @error('fecha_alta')<div class="error-msg">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-12">
