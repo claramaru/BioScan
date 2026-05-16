@@ -1,53 +1,67 @@
-# BioScan
+# 🗄️ Base de Datos — BioScan2
 
-Aplicación web para la gestión de explotaciones ganaderas, animales, alimentación y usuarios.
+Base de datos del proyecto **BioScan**, un sistema de gestión de animales en cebaderos que incluye control de alimentación, fichas médicas, gestión de usuarios y sistema de roles y privilegios.
 
-## Objetivo
+- **Motor:** MariaDB 10.4.32
+- **Charset:** utf8mb4 / utf8mb4_unicode_ci
+- **Generado con:** phpMyAdmin 5.2.1
 
-BioScan permite registrar y consultar información relacionada con:
-- animales,
-- cebaderos,
-- alimentación,
-- pienso,
-- fichas médicas,
-- usuarios y roles.
+---
 
-## Stack tecnológico
+## 📋 Tablas del sistema
 
-- PHP 8.2
-- Laravel 12
-- Blade
-- JavaScript
-- Vite
-- Bootstrap 5
-- Bootstrap Icons
-- CSS personalizado
-- MySQL / MariaDB
+### 🐄 Núcleo de negocio
 
-## Estructura del proyecto
+| Tabla | Descripción |
+|-------|-------------|
+| `cebadero` | Instalaciones donde se alojan los animales (nombre y ubicación) |
+| `animal` | Registro de animales: especie, raza, lote, cebadero asignado y pienso recomendado |
+| `pienso` | Catálogo de tipos de pienso disponibles (crecimiento, engorde, mantenimiento, adaptación) |
+| `alimentacion` | Registro diario de alimentación por animal: tipo de pienso, cantidad y fecha |
+| `ficha_medica` | Historial médico de cada animal: diagnóstico, tratamiento y observaciones |
 
-- `app/` → Lógica principal de la aplicación (modelos, controladores, providers)
-- `resources/views/` → Vistas Blade
-- `resources/js/` → JavaScript fuente
-- `resources/css/` → CSS fuente
-- `public/` → Archivos públicos compilados y recursos estáticos
-- `routes/` → Definición de rutas web y API
-- `database/migrations/` → Migraciones de base de datos
-- `database/seeders/` → Datos de ejemplo o iniciales
-- `tests/` → Tests automáticos
+### 👤 Usuarios y control de acceso
 
-## Módulos principales
+| Tabla | Descripción |
+|-------|-------------|
+| `usuario` | Usuarios de la aplicación con email, contraseña y rol asignado |
+| `rol` | Roles del sistema: administrador, supervisor, operario, veterinario, invitado |
+| `privilegio` | Permisos granulares sobre cada módulo (ver, crear, editar, borrar) |
+| `rol_privilegio` | Relación N:M que asigna privilegios a cada rol |
 
-- `Animales` → Alta, edición, consulta e historial de animales
-- `Cebaderos` → Gestión de cebaderos
-- `Alimentación` → Registro y consulta de alimentación
-- `Piensos` → Gestión de tipos de pienso
-- `Usuarios y roles` → Control de acceso y permisos
-- `Ficha médica` → Información sanitaria asociada a animales
+### ⚙️ Infraestructura Laravel
 
-## Requisitos
+| Tabla | Descripción |
+|-------|-------------|
+| `users` | Tabla de autenticación nativa de Laravel |
+| `sessions` | Gestión de sesiones activas |
+| `cache` / `cache_locks` | Sistema de caché de Laravel |
+| `jobs` / `job_batches` / `failed_jobs` | Cola de trabajos en segundo plano |
+| `migrations` | Historial de migraciones ejecutadas |
+| `password_reset_tokens` | Tokens para recuperación de contraseña |
 
-- PHP 8.2 o superior
-- Composer
-- Node.js y npm
-- MySQL o MariaDB
+---
+
+## 🔗 Relaciones principales
+
+```
+cebadero ──< animal >── pienso
+animal ──< alimentacion >── pienso
+animal ──< alimentacion >── usuario
+animal ──< ficha_medica >── usuario
+rol ──< rol_privilegio >── privilegio
+usuario >── rol
+```
+
+---
+
+## 👥 Roles y privilegios
+
+| Rol | Privilegios |
+|-----|-------------|
+| `administrador` | Acceso total (todos los privilegios) |
+| `supervisor` | Ver/crear/editar animales, alimentación y fichas; gestionar pienso |
+| `operario` | Ver animales, ver/crear alimentación, ver fichas, editar observaciones |
+| `veterinario` | Ver/editar animales, gestión completa de alimentación y fichas médicas |
+| `invitado` | Solo lectura: ver animales, alimentación y fichas |
+---
