@@ -64,6 +64,8 @@
         </div>
     @endif
 
+    <div id="cebadero-delete-warning" class="alert alert-warning d-none" role="alert"></div>
+
     <div class="top-bar">
         <div class="page-title">Cebaderos</div>
         <div class="d-flex gap-2 align-items-center flex-wrap">
@@ -213,7 +215,7 @@
                                             title="Eliminar"
                                             data-delete-url="{{ route('cebadero.destroy', $cebadero['id_cebadero']) }}"
                                             data-nombre="{{ $cebadero['nombre'] }}"
-                                            @disabled($cebadero['animales_count'] > 0)
+                                            data-animales="{{ $cebadero['animales_count'] }}"
                                         >
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -290,6 +292,7 @@
     const deleteName = document.getElementById('delete-cebadero-name');
     const deleteInput = document.getElementById('delete-cebadero-confirm-input');
     const deleteConfirmBtn = document.getElementById('confirm-delete-cebadero-btn');
+    const deleteWarning = document.getElementById('cebadero-delete-warning');
     // Se reutiliza para no lanzar una peticion por cada tecla.
     let debounceId = null;
 
@@ -349,7 +352,6 @@
             const estadoTexto = escapeHtml(cebadero.estado || 'Sin datos');
             const editarUrl = urls.editar.replace('__ID__', cebadero.id_cebadero);
             const borrarUrl = escapeHtml(cebadero.delete_url || urls.borrar.replace('__ID__', cebadero.id_cebadero));
-            const puedeEliminarFila = Number(cebadero.animales_count ?? 0) === 0;
             const accionesHtml = mostrarAcciones
                 ? `
                     <td class="td-acciones">
@@ -366,7 +368,7 @@
                                     title="Eliminar"
                                     data-delete-url="${borrarUrl}"
                                     data-nombre="${nombre}"
-                                    ${puedeEliminarFila ? '' : 'disabled'}
+                                    data-animales="${Number(cebadero.animales_count ?? 0)}"
                                 >
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -407,10 +409,23 @@
 
     function abrirModalEliminar(button) {
         const deleteUrl = button.dataset.deleteUrl;
+        const animalesCount = Number(button.dataset.animales || 0);
+
+        if (animalesCount > 0) {
+            if (deleteWarning) {
+                const plural = animalesCount === 1 ? 'animal asociado' : 'animales asociados';
+                deleteWarning.textContent = `No se puede eliminar "${button.dataset.nombre || 'este cebadero'}" porque tiene ${animalesCount} ${plural}.`;
+                deleteWarning.classList.remove('d-none');
+                deleteWarning.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            return;
+        }
 
         if (!deleteUrl || !deleteModal || !deleteModalForm) {
             return;
         }
+
+        deleteWarning?.classList.add('d-none');
 
         if (deleteName) {
             deleteName.textContent = button.dataset.nombre || '-';
@@ -474,7 +489,7 @@
 
     document.addEventListener('click', (event) => {
         const button = event.target.closest('.js-borrar-cebadero');
-        if (!button || button.disabled) {
+        if (!button) {
             return;
         }
 
