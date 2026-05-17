@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Schema;
@@ -49,7 +50,21 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $user->delete();
+        DB::transaction(function () use ($user) {
+            if (Schema::hasTable('alimentacion') && Schema::hasColumn('alimentacion', 'id_usuario')) {
+                DB::table('alimentacion')
+                    ->where('id_usuario', $user->id_usuario)
+                    ->update(['id_usuario' => null]);
+            }
+
+            if (Schema::hasTable('ficha_medica') && Schema::hasColumn('ficha_medica', 'id_usuario')) {
+                DB::table('ficha_medica')
+                    ->where('id_usuario', $user->id_usuario)
+                    ->update(['id_usuario' => null]);
+            }
+
+            $user->delete();
+        });
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

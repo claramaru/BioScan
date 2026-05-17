@@ -216,6 +216,57 @@
     margin-top: 2px;
 }
 
+.profile-modal-open {
+    overflow: hidden;
+}
+
+.profile-delete-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, .56);
+}
+
+.profile-delete-modal-backdrop[hidden] {
+    display: none;
+}
+
+.profile-delete-modal {
+    width: min(560px, 100%);
+    background: #fff;
+    border-radius: 18px;
+    border: 1px solid #fee2e2;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, .24);
+    padding: 24px;
+}
+
+.profile-delete-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.profile-delete-modal-close {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 12px;
+    background: #f3f4f6;
+    color: #111827;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.profile-delete-modal-close:hover {
+    background: #e5e7eb;
+}
+
 .profile-inline-note {
     font-size: 13.12px;
     color: var(--muted);
